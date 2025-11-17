@@ -1,10 +1,26 @@
-.idea
-*.iml
-.vscode
-build
-dist
-downloads
-node_modules
-*.zip
-npm-debug.log
-/.vs
+# Node modules (if accidentally installed)
+node_modules/
+
+# Build files (we keep dist/ for GitHub Pages)
+# Uncomment these if you rebuild from source
+# dist/
+
+# Development files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp

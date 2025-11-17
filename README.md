@@ -1,176 +1,155 @@
-# JSON Editor
+# JSON Editor - MR901.CO.IN
 
-[![Version](https://img.shields.io/npm/v/jsoneditor.svg)](https://www.npmjs.com/package/jsoneditor)
-[![Downloads](https://img.shields.io/npm/dm/jsoneditor.svg)](https://www.npmjs.com/package/jsoneditor)
-[![Maintenance](https://img.shields.io/maintenance/yes/2025.svg)](https://github.com/josdejong/jsoneditor/pulse)
-[![License](https://img.shields.io/github/license/josdejong/jsoneditor.svg)](https://github.com/josdejong/jsoneditor/blob/master/LICENSE)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjosdejong%2Fjsoneditor.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjosdejong%2Fjsoneditor?ref=badge_shield)
+A powerful, feature-rich JSON editor ready for GitHub Pages deployment. Edit, validate, format, and transform JSON with ease.
 
-JSON Editor is a web-based tool to view, edit, format, and validate JSON. It has various modes such as a tree editor, a code editor, and a plain text editor. The editor can be used as a component in your own web application. It can be loaded as CommonJS module, AMD module, or as a regular javascript file.
+![JSON Editor](https://img.shields.io/badge/JSON-Editor-667eea?style=for-the-badge)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)
 
-The library was originally developed as core component of the popular web application https://jsoneditoronline.org and has been open sourced since then.
+## 🚀 Features
 
-Supported browsers: Chrome, Firefox, Safari, Edge.
+### Core Editing Features
+- **Multiple Modes**: Switch between Tree, Code, and Text editing modes
+- **Drag & Drop**: Reorder items easily in tree view
+- **Search & Replace**: Find and replace text with Ctrl+F / Ctrl+H
+- **Undo/Redo**: Full undo/redo support (Ctrl+Z / Ctrl+Y)
 
-<img alt="json editor" src="https://raw.github.com/josdejong/jsoneditor/master/misc/jsoneditor.png"> &nbsp; <img alt="code editor" src="https://raw.github.com/josdejong/jsoneditor/master/misc/codeeditor.png">
+### Advanced Features
+- **JSON Schema Validation**: Automatic validation with visual error indicators
+- **Color Picker**: Click on hex color values to open built-in color picker
+- **Repair JSON**: Automatically fix common JSON syntax errors
+- **Format/Compact**: Pretty-print or minify JSON with one click
 
-Continuous integration tests are run on [GitHub Actions](https://github.com/josdejong/mathjs/actions), and [LambdaTest](https://www.lambdatest.com) is used to test on all major browsers.
+### File Operations
+- **Load JSON**: Import JSON files from your computer
+- **Save JSON**: Export JSON to local files
+- **Example Data**: Quick-start with example JSON
 
-[![LambdaTest](https://raw.github.com/josdejong/mathjs/master/misc/lambdatest.svg)](https://www.lambdatest.com)
+## 🎯 Usage
 
-Thanks, GitHub Actions and LambdaTest for the generous support for this open source project!
+### Online
+Simply open `index.html` in your web browser or visit the deployed GitHub Pages URL.
 
-## Successor: svelte-jsoneditor
+### Local Development
+1. Clone this repository
+2. Open `index.html` in your browser
+   - Or run a local server: `python3 -m http.server 8888`
+   - Access at: `http://localhost:8888`
 
-This library [`jsoneditor`](https://github.com/josdejong/jsoneditor) has a successor: [`svelte-jsoneditor`](https://github.com/josdejong/svelte-jsoneditor). The new editor is not a one-to-one replacement, so there may be reasons to stick with `jsoneditor`. 
-The main differences between the two [are described here](https://github.com/josdejong/svelte-jsoneditor#differences-between-josdejongsvelte-jsoneditor-and-josdejongjsoneditor).
+## ⌨️ Keyboard Shortcuts
 
-## Features
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+Z` | Undo |
+| `Ctrl+Y` or `Ctrl+Shift+Z` | Redo |
+| `Ctrl+F` | Search |
+| `Ctrl+H` | Search & Replace |
+| `Ctrl+D` | Duplicate field/value |
+| `Ctrl+Enter` | Open link or color picker |
+| `Alt+End` | Move to last field |
+| `Ctrl+M` | Show actions menu |
 
-JSONEditor has various modes, with the following features.
+## 🌐 GitHub Pages Deployment
 
-### Tree mode
+### Method 1: Direct Deployment
+1. Push this directory to your GitHub repository
+2. Go to repository Settings → Pages
+3. Set source to main branch → `/jsoneditor` folder
+4. Your editor will be live at `https://yourusername.github.io/repository/jsoneditor/`
 
-- Change, add, move, remove, and duplicate fields and values.
-- Sort arrays and objects.
-- Transform JSON using [JMESPath](http://jmespath.org/) queries.
-- Colorized code.
-- Color picker.
-- Search & highlight text in the tree view.
-- Undo and redo all actions.
-- JSON schema validation (powered by [ajv](https://github.com/epoberezkin/ajv)).
+### Method 2: Root Deployment
+1. Move all files from `jsoneditor/` to repository root
+2. Go to repository Settings → Pages
+3. Set source to main branch → root
+4. Your editor will be live at `https://yourusername.github.io/repository/`
 
-### Code mode
-
-- Colorized code (powered by [Ace](https://ace.c9.io)).
-- Inspect JSON (powered by [Ace](https://ace.c9.io)).
-- Format and compact JSON.
-- Repair JSON.
-- JSON schema validation (powered by [ajv](https://github.com/epoberezkin/ajv)).
-
-### Text mode
-
-- Format and compact JSON.
-- Repair JSON.
-- JSON schema validation (powered by [ajv](https://github.com/epoberezkin/ajv)).
-
-### Preview mode
-
-- Handle large JSON documents up to 500 MiB.
-- Transform JSON using [JMESPath](http://jmespath.org/) queries.
-- Format and compact JSON.
-- Repair JSON.
-- JSON schema validation (powered by [ajv](https://github.com/epoberezkin/ajv)).
-
-## Documentation
-
-- Documentation:
-  - [API](https://github.com/josdejong/jsoneditor/tree/master/docs/api.md)
-  - [Usage](https://github.com/josdejong/jsoneditor/tree/master/docs/usage.md)
-  - [Shortcut keys](https://github.com/josdejong/jsoneditor/tree/master/docs/shortcut_keys.md)
-- [Examples](https://github.com/josdejong/jsoneditor/tree/master/examples)
-- [Source](https://github.com/josdejong/jsoneditor)
-- [History](https://github.com/josdejong/jsoneditor/blob/master/HISTORY.md)
-
-
-## Install
-
-with npm (recommended):
-
-    npm install jsoneditor
-
-Alternatively, you can use another JavaScript package manager like https://yarnpkg.com/, or a CDN such as https://cdnjs.com/ or https://www.jsdelivr.com/.
-
-## Use
-
-> Note that in the following example, you'll have to change the urls `jsoneditor/dist/jsoneditor.min.js` and `jsoneditor/dist/jsoneditor.min.css` to match the place where you've downloaded the library, or fill in the URL of the CDN you're using.
-
-```html
-<!DOCTYPE HTML>
-<html lang="en">
-<head>
-    <!-- when using the mode "code", it's important to specify charset utf-8 -->
-    <meta charset="utf-8">
-
-    <link href="jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
-    <script src="jsoneditor/dist/jsoneditor.min.js"></script>
-</head>
-<body>
-    <div id="jsoneditor" style="width: 400px; height: 400px;"></div>
-
-    <script>
-        // create the editor
-        const container = document.getElementById("jsoneditor")
-        const options = {}
-        const editor = new JSONEditor(container, options)
-
-        // set json
-        const initialJson = {
-            "Array": [1, 2, 3],
-            "Boolean": true,
-            "Null": null,
-            "Number": 123,
-            "Object": {"a": "b", "c": "d"},
-            "String": "Hello World"
-        }
-        editor.set(initialJson)
-
-        // get json
-        const updatedJson = editor.get()
-    </script>
-</body>
-</html>
-```
-
-
-## Build
-
-The code of the JSON Editor is located in the folder `./src`. To build 
-jsoneditor:
-
-- Install dependencies:
-
-  ```
-  npm install
-  ```
-
-- Build JSON Editor:
-
-  ```
-  npm run build
-  ```
-
-  This will generate the files `./jsoneditor.js`, `./jsoneditor.css`, and  
-  minified versions in the dist of the project.
-
-- To automatically build when a source file has changed:
-
-  ```
-  npm start
-  ```
-
-  This will update `./jsoneditor.js` and `./jsoneditor.css` in the dist folder
-  on every change, but it will **NOT** update the minified versions as that's
-  an expensive operation.
-
-
-## Test
-
-Run unit tests:
+## 📁 File Structure
 
 ```
-npm test
+jsoneditor/
+├── index.html              # Main application file
+├── dist/                   # Distribution files
+│   ├── jsoneditor.min.js   # Minified JavaScript
+│   ├── jsoneditor.min.css  # Minified CSS
+│   └── img/                # Icons and images
+├── docs/                   # API documentation
+├── README.md               # This file
+├── LICENSE                 # Apache 2.0 License
+└── NOTICE                  # Copyright notices
 ```
 
-Run code linting ([JavaScript Standard Style](https://standardjs.com/)):
+## 🎨 Customization
 
+You can customize the editor by modifying `index.html`:
+
+### Change Colors
+Edit the CSS gradient in the `<style>` section:
+```css
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 ```
-npm run lint
+
+### Add JSON Schema Validation
+Add schema to editor options:
+```javascript
+const options = {
+  schema: {
+    type: 'object',
+    properties: {
+      name: { type: 'string' },
+      age: { type: 'number' }
+    }
+  }
+};
 ```
 
+### Change Default Example
+Modify the `loadExample()` function in the script section.
 
-## License
+## 🛠️ Technologies
 
-`jsoneditor` is released as open source under the permissive the [Apache 2.0 license](LICENSE.md).
+- **JSONEditor**: [josdejong/jsoneditor](https://github.com/josdejong/jsoneditor) - Core editor library
+- **FileSaver.js**: File download functionality
+- **Vanilla JavaScript**: No framework dependencies
+- **Modern CSS**: Responsive design with CSS Grid and Flexbox
 
-**If you are using jsoneditor commercially, there is a _social_ (but no legal) expectation that you help fund its maintenance. [Start here](https://github.com/sponsors/josdejong).**
+## 📝 License
+
+This project uses JSONEditor which is licensed under the Apache 2.0 License.
+
+Original JSONEditor by Jos de Jong: https://github.com/josdejong/jsoneditor
+
+## 🤝 Credits
+
+- **JSONEditor Library**: [Jos de Jong](https://github.com/josdejong)
+- **Custom Implementation**: [MR901.CO.IN](https://mr901.co.in)
+
+## 📧 Support
+
+For issues related to:
+- **This implementation**: Contact via [MR901.CO.IN](https://mr901.co.in)
+- **JSONEditor library**: See [JSONEditor GitHub](https://github.com/josdejong/jsoneditor/issues)
+
+## 🌟 Features Showcase
+
+### Tree Mode
+- Visual hierarchical view
+- Expandable/collapsible nodes
+- Drag-and-drop reordering
+- Context menu for actions
+- Color picker for hex values
+
+### Code Mode
+- Syntax highlighting (powered by Ace)
+- Line numbers
+- Code folding
+- Auto-completion
+- Error detection
+
+### Text Mode
+- Plain text editing
+- Fast for large files
+- Simple copy/paste
+- Minimal interface
+
+---
+
+Made with ❤️ by [MR901.CO.IN](https://mr901.co.in)

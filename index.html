@@ -1,0 +1,563 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Editor - MR901.CO.IN</title>
+  
+  <link href="dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
+  <script src="dist/jsoneditor.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      padding: 20px 0;
+    }
+    
+    header h1 {
+      margin: 0 0 10px 0;
+      font-size: 2.5em;
+      font-weight: 700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    header p {
+      margin: 5px 0;
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    
+    .main-content {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    
+    .toolbar {
+      background: #f8f9fa;
+      padding: 15px 20px;
+      border-bottom: 2px solid #e9ecef;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    button, .file-button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    button:hover, .file-button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:active, .file-button:active {
+      transform: translateY(0);
+    }
+    
+    button.secondary {
+      background: #6c757d;
+    }
+    
+    button.secondary:hover {
+      background: #5a6268;
+      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+    }
+    
+    button.success {
+      background: #28a745;
+    }
+    
+    button.success:hover {
+      background: #218838;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+    
+    button.danger {
+      background: #dc3545;
+    }
+    
+    button.danger:hover {
+      background: #c82333;
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+    
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+    
+    .divider {
+      width: 1px;
+      background: #dee2e6;
+      margin: 0 5px;
+    }
+    
+    #jsoneditor {
+      height: 600px;
+      width: 100%;
+    }
+    
+    .info-panel {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px 20px;
+      margin: 20px;
+      border-radius: 4px;
+    }
+    
+    .info-panel h3 {
+      margin: 0 0 10px 0;
+      color: #1976D2;
+      font-size: 1.1em;
+    }
+    
+    .info-panel ul {
+      margin: 5px 0;
+      padding-left: 20px;
+    }
+    
+    .info-panel li {
+      margin: 5px 0;
+      color: #333;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .feature-box {
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #2196F3;
+    }
+    
+    .feature-box strong {
+      color: #1976D2;
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .validation-status {
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+      margin-left: auto;
+    }
+    
+    .validation-status.valid {
+      background: #d4edda;
+      color: #155724;
+      display: inline-block;
+    }
+    
+    .validation-status.invalid {
+      background: #f8d7da;
+      color: #721c24;
+      display: inline-block;
+    }
+    
+    footer {
+      text-align: center;
+      color: white;
+      padding: 20px;
+      margin-top: 30px;
+      opacity: 0.9;
+    }
+    
+    footer a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .toggle-info {
+      background: #764ba2;
+      color: white;
+      margin-bottom: 20px;
+    }
+    
+    .toggle-info:hover {
+      background: #663399;
+    }
+    
+    .info-panel.collapsed {
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.8em;
+      }
+      
+      .toolbar {
+        padding: 10px;
+      }
+      
+      button, .file-button {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+      
+      #jsoneditor {
+        height: 400px;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎯 JSON Editor</h1>
+      <p>Powerful JSON editing tool by <strong>MR901.CO.IN</strong></p>
+      <p>Edit, validate, format, and transform JSON with ease</p>
+    </header>
+    
+    <div class="main-content">
+      <div class="toolbar">
+        <div class="button-group">
+          <div class="file-input-wrapper">
+            <label for="loadFile" class="file-button">
+              📁 Load JSON
+            </label>
+            <input type="file" id="loadFile" accept=".json,application/json">
+          </div>
+          <button onclick="saveJSON()" class="success">💾 Save JSON</button>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="button-group">
+          <button onclick="formatJSON()">✨ Format</button>
+          <button onclick="compactJSON()">📦 Compact</button>
+          <button onclick="repairJSON()" class="secondary">🔧 Repair</button>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="button-group">
+          <button onclick="clearEditor()" class="danger">🗑️ Clear</button>
+          <button onclick="loadExample()">📝 Example</button>
+        </div>
+        
+        <span class="validation-status" id="validationStatus"></span>
+      </div>
+      
+      <div id="jsoneditor"></div>
+      
+      <div class="info-panel" id="infoPanel">
+        <h3>📚 Features & Keyboard Shortcuts</h3>
+        
+        <div class="features-grid">
+          <div class="feature-box">
+            <strong>Editing Modes</strong>
+            Tree view, Code editor, and Text mode available via the mode selector
+          </div>
+          <div class="feature-box">
+            <strong>JSON Schema Validation</strong>
+            Automatic validation with visual error indicators (define schema in options)
+          </div>
+          <div class="feature-box">
+            <strong>Color Picker</strong>
+            Click on hex color values to open the built-in color picker
+          </div>
+          <div class="feature-box">
+            <strong>Search & Replace</strong>
+            Ctrl+F (or Cmd+F) to search, Ctrl+H for search & replace
+          </div>
+          <div class="feature-box">
+            <strong>Undo / Redo</strong>
+            Ctrl+Z to undo, Ctrl+Y or Ctrl+Shift+Z to redo
+          </div>
+          <div class="feature-box">
+            <strong>Repair JSON</strong>
+            Automatically fix common JSON syntax errors with one click
+          </div>
+        </div>
+        
+        <h3 style="margin-top: 20px;">⌨️ Additional Shortcuts</h3>
+        <ul>
+          <li><strong>Ctrl+D:</strong> Duplicate field or value</li>
+          <li><strong>Ctrl+Enter:</strong> Open link or color picker</li>
+          <li><strong>Alt+End:</strong> Move to last field</li>
+          <li><strong>Ctrl+M:</strong> Show actions menu</li>
+          <li><strong>Drag & Drop:</strong> Reorder items in tree view</li>
+        </ul>
+      </div>
+      
+      <div style="padding: 15px 20px; text-align: center;">
+        <button onclick="toggleInfo()" class="toggle-info">
+          ℹ️ Toggle Instructions
+        </button>
+      </div>
+    </div>
+    
+    <footer>
+      <p>Made with ❤️ by <a href="https://mr901.co.in" target="_blank">MR901.CO.IN</a></p>
+      <p style="font-size: 0.9em; margin-top: 5px;">
+        Powered by <a href="https://github.com/josdejong/jsoneditor" target="_blank">JSONEditor</a> | 
+        Open Source under Apache 2.0 License
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // Create the editor
+    const container = document.getElementById('jsoneditor');
+    const options = {
+      mode: 'tree',
+      modes: ['tree', 'code', 'text'], // Available modes
+      search: true,
+      navigationBar: true,
+      statusBar: true,
+      onChange: function() {
+        updateValidationStatus();
+      },
+      onValidationError: function(errors) {
+        if (errors.length > 0) {
+          showValidationStatus('invalid', `${errors.length} validation error(s)`);
+        }
+      },
+      onModeChange: function(newMode, oldMode) {
+        console.log('Mode switched from', oldMode, 'to', newMode);
+      }
+    };
+    
+    const editor = new JSONEditor(container, options);
+    
+    // Load initial example JSON
+    loadExample();
+    
+    // Load JSON from file
+    document.getElementById('loadFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const json = JSON.parse(event.target.result);
+          editor.set(json);
+          showValidationStatus('valid', 'JSON loaded successfully');
+        } catch (error) {
+          alert('Error parsing JSON file: ' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+    
+    // Save JSON to file
+    function saveJSON() {
+      try {
+        const json = editor.get();
+        const jsonString = JSON.stringify(json, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+        
+        const filename = prompt('Enter filename:', 'data.json') || 'data.json';
+        const finalFilename = filename.endsWith('.json') ? filename : filename + '.json';
+        
+        saveAs(blob, finalFilename);
+        showValidationStatus('valid', 'JSON saved successfully');
+      } catch (error) {
+        alert('Error saving JSON: ' + error.message);
+      }
+    }
+    
+    // Format JSON (pretty-print)
+    function formatJSON() {
+      try {
+        const json = editor.get();
+        editor.set(json);
+        editor.expandAll();
+        showValidationStatus('valid', 'JSON formatted');
+      } catch (error) {
+        alert('Cannot format: ' + error.message);
+      }
+    }
+    
+    // Compact JSON (minify)
+    function compactJSON() {
+      try {
+        const json = editor.get();
+        const compact = JSON.stringify(json);
+        editor.setText(compact);
+        showValidationStatus('valid', 'JSON compacted');
+      } catch (error) {
+        alert('Cannot compact: ' + error.message);
+      }
+    }
+    
+    // Repair JSON
+    function repairJSON() {
+      try {
+        editor.repair();
+        showValidationStatus('valid', 'JSON repaired');
+      } catch (error) {
+        alert('Cannot repair: ' + error.message);
+      }
+    }
+    
+    // Clear editor
+    function clearEditor() {
+      if (confirm('Are you sure you want to clear all content?')) {
+        editor.set({});
+        showValidationStatus('valid', 'Editor cleared');
+      }
+    }
+    
+    // Load example JSON with various data types
+    function loadExample() {
+      const exampleJSON = {
+        "personal": {
+          "name": "John Doe",
+          "email": "john.doe@example.com",
+          "age": 30,
+          "active": true,
+          "website": "https://example.com",
+          "favoriteColor": "#667eea"
+        },
+        "address": {
+          "street": "123 Main St",
+          "city": "New York",
+          "state": "NY",
+          "zipCode": "10001",
+          "coordinates": {
+            "latitude": 40.7128,
+            "longitude": -74.0060
+          }
+        },
+        "hobbies": ["reading", "coding", "photography", "traveling"],
+        "skills": [
+          {
+            "name": "JavaScript",
+            "level": "Expert",
+            "years": 8
+          },
+          {
+            "name": "Python",
+            "level": "Advanced",
+            "years": 5
+          },
+          {
+            "name": "Docker",
+            "level": "Intermediate",
+            "years": 3
+          }
+        ],
+        "projects": [
+          {
+            "title": "JSON Editor",
+            "description": "A powerful web-based JSON editor",
+            "status": "active",
+            "tags": ["javascript", "web", "tool"]
+          }
+        ],
+        "metadata": {
+          "createdAt": "2025-11-17T00:00:00Z",
+          "updatedAt": "2025-11-17T01:30:00Z",
+          "version": "1.0.0"
+        }
+      };
+      
+      editor.set(exampleJSON);
+      editor.expandAll();
+      showValidationStatus('valid', 'Example loaded');
+    }
+    
+    // Toggle info panel
+    function toggleInfo() {
+      const panel = document.getElementById('infoPanel');
+      panel.classList.toggle('collapsed');
+    }
+    
+    // Update validation status
+    function updateValidationStatus() {
+      try {
+        editor.get();
+        showValidationStatus('valid', '✓ Valid JSON');
+      } catch (error) {
+        showValidationStatus('invalid', '✗ Invalid JSON');
+      }
+    }
+    
+    // Show validation status
+    function showValidationStatus(type, message) {
+      const status = document.getElementById('validationStatus');
+      status.className = 'validation-status ' + type;
+      status.textContent = message;
+      
+      // Auto-hide after 3 seconds for success messages
+      if (type === 'valid') {
+        setTimeout(() => {
+          status.style.display = 'none';
+        }, 3000);
+      }
+    }
+    
+    // Initial validation status
+    updateValidationStatus();
+  </script>
+</body>
+</html>
+
