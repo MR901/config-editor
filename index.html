@@ -10,16 +10,35 @@
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   
   <style>
+    :root {
+      --primary-blue: #2563eb;
+      --primary-blue-dark: #1d4ed8;
+      --secondary-gray: #64748b;
+      --success-green: #10b981;
+      --success-green-dark: #059669;
+      --danger-red: #ef4444;
+      --danger-red-dark: #dc2626;
+      --bg-gray: #f8fafc;
+      --text-dark: #1e293b;
+      --text-medium: #475569;
+      --text-light: #94a3b8;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+    
     * {
       box-sizing: border-box;
     }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
+      background: var(--bg-gray);
+      color: var(--text-dark);
+      line-height: 1.6;
     }
     
     .container {
@@ -29,40 +48,65 @@
     }
     
     header {
-      text-align: center;
-      color: white;
-      margin-bottom: 30px;
-      padding: 20px 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      padding: 20px 30px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-blue);
     }
     
     header h1 {
-      margin: 0 0 10px 0;
-      font-size: 2.5em;
-      font-weight: 700;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      margin: 0 0 8px 0;
+      font-size: 1.75em;
+      font-weight: 600;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
     }
     
     header p {
-      margin: 5px 0;
-      font-size: 1.1em;
-      opacity: 0.9;
+      margin: 0;
+      font-size: 0.95em;
+      color: var(--text-medium);
+    }
+    
+    header p strong {
+      color: var(--primary-blue);
+      font-weight: 600;
     }
     
     .main-content {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
       overflow: hidden;
+      position: relative;
     }
     
     .toolbar {
-      background: #f8f9fa;
-      padding: 15px 20px;
-      border-bottom: 2px solid #e9ecef;
+      background: white;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
+    }
+    
+    .toolbar-section {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .toolbar-section-label {
+      font-size: 0.75em;
+      color: var(--text-light);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-right: 8px;
     }
     
     .button-group {
@@ -72,55 +116,63 @@
     }
     
     button, .file-button {
-      background: #667eea;
-      color: white;
-      border: none;
-      padding: 10px 20px;
+      background: white;
+      color: var(--text-dark);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 500;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      font-family: inherit;
     }
     
     button:hover, .file-button:hover {
-      background: #5568d3;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      background: var(--bg-gray);
+      border-color: var(--secondary-gray);
+      box-shadow: var(--shadow-sm);
     }
     
     button:active, .file-button:active {
-      transform: translateY(0);
+      transform: translateY(1px);
+      box-shadow: none;
     }
     
-    button.secondary {
-      background: #6c757d;
+    button.primary {
+      background: var(--primary-blue);
+      color: white;
+      border-color: var(--primary-blue);
     }
     
-    button.secondary:hover {
-      background: #5a6268;
-      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+    button.primary:hover {
+      background: var(--primary-blue-dark);
+      border-color: var(--primary-blue-dark);
     }
     
     button.success {
-      background: #28a745;
+      background: var(--success-green);
+      color: white;
+      border-color: var(--success-green);
     }
     
     button.success:hover {
-      background: #218838;
-      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+      background: var(--success-green-dark);
+      border-color: var(--success-green-dark);
     }
     
     button.danger {
-      background: #dc3545;
+      background: white;
+      color: var(--danger-red);
+      border-color: var(--danger-red);
     }
     
     button.danger:hover {
-      background: #c82333;
-      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+      background: var(--danger-red);
+      color: white;
     }
     
     .file-input-wrapper {
@@ -136,8 +188,13 @@
     
     .divider {
       width: 1px;
-      background: #dee2e6;
-      margin: 0 5px;
+      height: 24px;
+      background: var(--border-color);
+      margin: 0 4px;
+    }
+    
+    .editor-container {
+      position: relative;
     }
     
     #jsoneditor {
@@ -145,52 +202,120 @@
       width: 100%;
     }
     
-    .info-panel {
-      background: #e7f3ff;
-      border-left: 4px solid #2196F3;
-      padding: 15px 20px;
-      margin: 20px;
+    .help-button {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 1000;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+      padding: 0;
+    }
+    
+    .help-button:hover {
+      background: var(--primary-blue-dark);
+      transform: scale(1.1);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .help-button::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -35px;
+      right: 0;
+      background: var(--text-dark);
+      color: white;
+      padding: 6px 12px;
       border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    
+    .help-button:hover::after {
+      opacity: 1;
+    }
+    
+    .info-panel {
+      background: white;
+      border-top: 1px solid var(--border-color);
+      padding: 24px;
+      display: none;
+    }
+    
+    .info-panel.visible {
+      display: block;
     }
     
     .info-panel h3 {
-      margin: 0 0 10px 0;
-      color: #1976D2;
+      margin: 0 0 16px 0;
+      color: var(--text-dark);
       font-size: 1.1em;
+      font-weight: 600;
     }
     
     .info-panel ul {
-      margin: 5px 0;
+      margin: 0 0 16px 0;
       padding-left: 20px;
     }
     
     .info-panel li {
-      margin: 5px 0;
-      color: #333;
+      margin: 8px 0;
+      color: var(--text-medium);
+      font-size: 0.95em;
+    }
+    
+    .info-panel li strong {
+      color: var(--text-dark);
+      font-weight: 600;
     }
     
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      margin-top: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
     }
     
     .feature-box {
-      background: white;
-      padding: 12px;
+      background: var(--bg-gray);
+      padding: 16px;
       border-radius: 6px;
-      border: 1px solid #2196F3;
+      border: 1px solid var(--border-color);
     }
     
     .feature-box strong {
-      color: #1976D2;
+      color: var(--primary-blue);
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+    
+    .feature-box p {
+      margin: 0;
+      color: var(--text-medium);
+      font-size: 0.9em;
+      line-height: 1.5;
     }
     
     .validation-status {
-      padding: 8px 12px;
+      padding: 6px 12px;
       border-radius: 4px;
       font-size: 13px;
       font-weight: 500;
@@ -199,27 +324,33 @@
     }
     
     .validation-status.valid {
-      background: #d4edda;
-      color: #155724;
-      display: inline-block;
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     
     .validation-status.invalid {
-      background: #f8d7da;
-      color: #721c24;
-      display: inline-block;
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     
     footer {
       text-align: center;
-      color: white;
-      padding: 20px;
-      margin-top: 30px;
-      opacity: 0.9;
+      color: var(--text-medium);
+      padding: 24px;
+      margin-top: 20px;
+      font-size: 0.9em;
     }
     
     footer a {
-      color: white;
+      color: var(--primary-blue);
       text-decoration: none;
       font-weight: 500;
     }
@@ -228,36 +359,40 @@
       text-decoration: underline;
     }
     
-    .toggle-info {
-      background: #764ba2;
-      color: white;
-      margin-bottom: 20px;
-    }
-    
-    .toggle-info:hover {
-      background: #663399;
-    }
-    
-    .info-panel.collapsed {
-      display: none;
-    }
-    
     @media (max-width: 768px) {
+      .container {
+        padding: 12px;
+      }
+      
+      header {
+        padding: 16px 20px;
+      }
+      
       header h1 {
-        font-size: 1.8em;
+        font-size: 1.4em;
       }
       
       .toolbar {
-        padding: 10px;
+        padding: 12px 16px;
+      }
+      
+      .toolbar-section-label {
+        display: none;
       }
       
       button, .file-button {
-        padding: 8px 16px;
+        padding: 8px 12px;
         font-size: 13px;
       }
       
       #jsoneditor {
-        height: 400px;
+        height: 450px;
+      }
+      
+      .help-button {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
       }
       
       .features-grid {
@@ -269,94 +404,124 @@
 <body>
   <div class="container">
     <header>
-      <h1>🎯 JSON Editor</h1>
-      <p>Powerful JSON editing tool by <strong>MR901.CO.IN</strong></p>
-      <p>Edit, validate, format, and transform JSON with ease</p>
+      <h1>JSON Editor</h1>
+      <p>Professional JSON editing tool by <strong>MR901.CO.IN</strong></p>
     </header>
     
     <div class="main-content">
       <div class="toolbar">
-        <div class="button-group">
-          <div class="file-input-wrapper">
-            <label for="loadFile" class="file-button">
-              📁 Load JSON
-            </label>
-            <input type="file" id="loadFile" accept=".json,application/json">
+        <div class="toolbar-section">
+          <span class="toolbar-section-label">File</span>
+          <div class="button-group">
+            <div class="file-input-wrapper">
+              <label for="loadFile" class="file-button primary">
+                <span>↑</span> Load
+              </label>
+              <input type="file" id="loadFile" accept=".json,application/json">
+            </div>
+            <button onclick="saveJSON()" class="success">
+              <span>↓</span> Save
+            </button>
           </div>
-          <button onclick="saveJSON()" class="success">💾 Save JSON</button>
         </div>
         
         <div class="divider"></div>
         
-        <div class="button-group">
-          <button onclick="formatJSON()">✨ Format</button>
-          <button onclick="compactJSON()">📦 Compact</button>
-          <button onclick="repairJSON()" class="secondary">🔧 Repair</button>
+        <div class="toolbar-section">
+          <span class="toolbar-section-label">Edit</span>
+          <div class="button-group">
+            <button onclick="formatJSON()">
+              <span>⚡</span> Format
+            </button>
+            <button onclick="compactJSON()">
+              <span>▣</span> Compact
+            </button>
+            <button onclick="repairJSON()">
+              <span>⚙</span> Repair
+            </button>
+          </div>
         </div>
         
         <div class="divider"></div>
         
-        <div class="button-group">
-          <button onclick="clearEditor()" class="danger">🗑️ Clear</button>
-          <button onclick="loadExample()">📝 Example</button>
+        <div class="toolbar-section">
+          <span class="toolbar-section-label">Actions</span>
+          <div class="button-group">
+            <button onclick="loadExample()">
+              <span>◈</span> Example
+            </button>
+            <button onclick="clearEditor()" class="danger">
+              <span>×</span> Clear
+            </button>
+          </div>
         </div>
         
         <span class="validation-status" id="validationStatus"></span>
       </div>
       
-      <div id="jsoneditor"></div>
+      <div class="editor-container">
+        <button class="help-button" onclick="toggleInfo()" data-tooltip="Help & Shortcuts" aria-label="Toggle help panel">
+          ?
+        </button>
+        <div id="jsoneditor"></div>
+      </div>
       
       <div class="info-panel" id="infoPanel">
-        <h3>📚 Features & Keyboard Shortcuts</h3>
+        <h3>Features & Capabilities</h3>
         
         <div class="features-grid">
           <div class="feature-box">
-            <strong>Editing Modes</strong>
-            Tree view, Code editor, and Text mode available via the mode selector
+            <strong>Multiple Editing Modes</strong>
+            <p>Switch between Tree view, Code editor, and Text mode using the mode selector</p>
           </div>
           <div class="feature-box">
             <strong>JSON Schema Validation</strong>
-            Automatic validation with visual error indicators (define schema in options)
+            <p>Automatic validation with visual error indicators and detailed error messages</p>
           </div>
           <div class="feature-box">
             <strong>Color Picker</strong>
-            Click on hex color values to open the built-in color picker
+            <p>Click on any hex color value to open the built-in color picker tool</p>
           </div>
           <div class="feature-box">
             <strong>Search & Replace</strong>
-            Ctrl+F (or Cmd+F) to search, Ctrl+H for search & replace
+            <p>Find and replace text throughout your JSON document</p>
           </div>
           <div class="feature-box">
-            <strong>Undo / Redo</strong>
-            Ctrl+Z to undo, Ctrl+Y or Ctrl+Shift+Z to redo
+            <strong>Undo & Redo</strong>
+            <p>Full history support for all editing operations</p>
           </div>
           <div class="feature-box">
-            <strong>Repair JSON</strong>
-            Automatically fix common JSON syntax errors with one click
+            <strong>Auto Repair</strong>
+            <p>Automatically fix common JSON syntax errors with one click</p>
           </div>
         </div>
         
-        <h3 style="margin-top: 20px;">⌨️ Additional Shortcuts</h3>
+        <h3>Keyboard Shortcuts</h3>
         <ul>
-          <li><strong>Ctrl+D:</strong> Duplicate field or value</li>
-          <li><strong>Ctrl+Enter:</strong> Open link or color picker</li>
+          <li><strong>Ctrl+Z / Cmd+Z:</strong> Undo last action</li>
+          <li><strong>Ctrl+Y / Cmd+Shift+Z:</strong> Redo action</li>
+          <li><strong>Ctrl+F / Cmd+F:</strong> Search in document</li>
+          <li><strong>Ctrl+H / Cmd+H:</strong> Search and replace</li>
+          <li><strong>Ctrl+D / Cmd+D:</strong> Duplicate field or value</li>
+          <li><strong>Ctrl+Enter / Cmd+Enter:</strong> Open link or color picker</li>
           <li><strong>Alt+End:</strong> Move to last field</li>
-          <li><strong>Ctrl+M:</strong> Show actions menu</li>
-          <li><strong>Drag & Drop:</strong> Reorder items in tree view</li>
+          <li><strong>Ctrl+M / Cmd+M:</strong> Show actions menu</li>
         </ul>
-      </div>
-      
-      <div style="padding: 15px 20px; text-align: center;">
-        <button onclick="toggleInfo()" class="toggle-info">
-          ℹ️ Toggle Instructions
-        </button>
+        
+        <h3>Tips</h3>
+        <ul>
+          <li>Drag and drop items in tree view to reorder them</li>
+          <li>Right-click on any field for context menu actions</li>
+          <li>Use the mode selector to switch between different editing views</li>
+          <li>The validation status shows real-time JSON validity</li>
+        </ul>
       </div>
     </div>
     
     <footer>
-      <p>Made with ❤️ by <a href="https://mr901.co.in" target="_blank">MR901.CO.IN</a></p>
-      <p style="font-size: 0.9em; margin-top: 5px;">
-        Powered by <a href="https://github.com/josdejong/jsoneditor" target="_blank">JSONEditor</a> | 
+      <p>Created by <a href="https://mr901.co.in" target="_blank">MR901.CO.IN</a></p>
+      <p style="margin-top: 8px;">
+        Powered by <a href="https://github.com/josdejong/jsoneditor" target="_blank">JSONEditor</a> • 
         Open Source under Apache 2.0 License
       </p>
     </footer>
@@ -367,7 +532,7 @@
     const container = document.getElementById('jsoneditor');
     const options = {
       mode: 'tree',
-      modes: ['tree', 'code', 'text'], // Available modes
+      modes: ['tree', 'code', 'text'],
       search: true,
       navigationBar: true,
       statusBar: true,
@@ -405,6 +570,9 @@
         }
       };
       reader.readAsText(file);
+      
+      // Reset the file input so the same file can be loaded again
+      e.target.value = '';
     });
     
     // Save JSON to file
@@ -469,54 +637,61 @@
     // Load example JSON with various data types
     function loadExample() {
       const exampleJSON = {
-        "personal": {
-          "name": "John Doe",
-          "email": "john.doe@example.com",
-          "age": 30,
+        "company": {
+          "name": "Tech Solutions Inc.",
+          "industry": "Software Development",
+          "founded": 2015,
           "active": true,
           "website": "https://example.com",
-          "favoriteColor": "#667eea"
+          "brandColor": "#2563eb"
         },
-        "address": {
-          "street": "123 Main St",
-          "city": "New York",
-          "state": "NY",
-          "zipCode": "10001",
+        "headquarters": {
+          "address": "100 Innovation Drive",
+          "city": "San Francisco",
+          "state": "CA",
+          "zipCode": "94105",
           "coordinates": {
-            "latitude": 40.7128,
-            "longitude": -74.0060
+            "latitude": 37.7749,
+            "longitude": -122.4194
           }
         },
-        "hobbies": ["reading", "coding", "photography", "traveling"],
-        "skills": [
+        "departments": ["Engineering", "Product", "Sales", "Marketing", "Support"],
+        "employees": [
           {
-            "name": "JavaScript",
-            "level": "Expert",
-            "years": 8
+            "id": 1001,
+            "name": "Alice Johnson",
+            "role": "Software Engineer",
+            "level": "Senior",
+            "experience": 8
           },
           {
-            "name": "Python",
-            "level": "Advanced",
-            "years": 5
+            "id": 1002,
+            "name": "Bob Smith",
+            "role": "Product Manager",
+            "level": "Lead",
+            "experience": 10
           },
           {
-            "name": "Docker",
-            "level": "Intermediate",
-            "years": 3
+            "id": 1003,
+            "name": "Carol White",
+            "role": "UX Designer",
+            "level": "Mid-level",
+            "experience": 5
           }
         ],
-        "projects": [
+        "products": [
           {
-            "title": "JSON Editor",
-            "description": "A powerful web-based JSON editor",
-            "status": "active",
-            "tags": ["javascript", "web", "tool"]
+            "name": "JSON Editor Pro",
+            "description": "Professional JSON editing tool for developers",
+            "status": "production",
+            "version": "1.0.0",
+            "tags": ["javascript", "editor", "productivity"]
           }
         ],
         "metadata": {
-          "createdAt": "2025-11-17T00:00:00Z",
-          "updatedAt": "2025-11-17T01:30:00Z",
-          "version": "1.0.0"
+          "createdAt": "2025-11-18T00:00:00Z",
+          "lastModified": "2025-11-18T02:00:00Z",
+          "schema_version": "2.0"
         }
       };
       
@@ -528,7 +703,7 @@
     // Toggle info panel
     function toggleInfo() {
       const panel = document.getElementById('infoPanel');
-      panel.classList.toggle('collapsed');
+      panel.classList.toggle('visible');
     }
     
     // Update validation status
@@ -560,4 +735,3 @@
   </script>
 </body>
 </html>
-
