@@ -405,7 +405,6 @@
   <div class="container">
     <header>
       <h1>JSON Editor</h1>
-      <p>Professional JSON editing tool by <strong>MR901.CO.IN</strong></p>
     </header>
     
     <div class="main-content">
@@ -435,6 +434,9 @@
             </button>
             <button onclick="compactJSON()">
               <span>▣</span> Compact
+            </button>
+            <button onclick="validateJSON()">
+              <span>✓</span> Validate
             </button>
             <button onclick="repairJSON()">
               <span>⚙</span> Repair
@@ -519,11 +521,7 @@
     </div>
     
     <footer>
-      <p>Created by <a href="https://mr901.co.in" target="_blank">MR901.CO.IN</a></p>
-      <p style="margin-top: 8px;">
-        Powered by <a href="https://github.com/josdejong/jsoneditor" target="_blank">JSONEditor</a> • 
-        Open Source under Apache 2.0 License
-      </p>
+      <p>By MR901.CO.IN • Powered by <a href="https://github.com/josdejong/jsoneditor" target="_blank">JSONEditor</a></p>
     </footer>
   </div>
 
@@ -620,11 +618,36 @@
       }
     }
     
+    // Validate JSON
+    async function validateJSON() {
+      try {
+        const errors = await editor.validate();
+        if (errors.length === 0) {
+          showValidationStatus('valid', '✓ No validation errors found');
+        } else {
+          showValidationStatus('invalid', `✗ Found ${errors.length} validation error(s)`);
+          // Display detailed errors in alert
+          const errorMessages = errors.map((err, idx) => 
+            `${idx + 1}. ${err.path ? err.path.join('.') + ': ' : ''}${err.message}`
+          ).join('\n');
+          alert('Validation Errors:\n\n' + errorMessages);
+        }
+      } catch (error) {
+        showValidationStatus('invalid', '✗ Invalid JSON syntax');
+        alert('Validation failed: ' + error.message);
+      }
+    }
+    
     // Repair JSON
     function repairJSON() {
       try {
-        editor.repair();
-        showValidationStatus('valid', 'JSON repaired');
+        const mode = editor.getMode();
+        if (['text', 'code', 'preview'].includes(mode)) {
+          editor.repair();
+          showValidationStatus('valid', 'JSON repaired');
+        } else {
+          alert('Repair is only available in Code or Text mode. Please switch modes first.');
+        }
       } catch (error) {
         alert('Cannot repair: ' + error.message);
       }
