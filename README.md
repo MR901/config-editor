@@ -2,6 +2,8 @@
 
 A powerful JSON/YAML editor for editing configuration files. Features a clean interface with multiple editing modes, real-time validation, and bidirectional format conversion.
 
+![Config Editor Screenshot](./screenshot.png)
+
 ## Features
 
 ### Dual Format Support
