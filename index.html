@@ -45,7 +45,7 @@
     }
     
     .container {
-      max-width: 1400px;
+      max-width: 1600px;
       margin: 0 auto;
       padding: 20px;
     }
@@ -86,7 +86,8 @@
       position: relative;
     }
     
-    .toolbar {
+    /* Main Toolbar */
+    .main-toolbar {
       background: white;
       padding: 16px 20px;
       border-bottom: 1px solid var(--border-color);
@@ -178,6 +179,11 @@
       color: white;
     }
     
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
     .file-input-wrapper {
       position: relative;
       overflow: hidden;
@@ -196,7 +202,7 @@
       margin: 0 4px;
     }
     
-    /* Format Toggle Buttons */
+    /* Format Toggle */
     .format-toggle {
       display: inline-flex;
       border: 1px solid var(--border-color);
@@ -244,83 +250,103 @@
       color: #92400e;
     }
     
-    /* Editor Container Styles */
-    .editor-container {
-      position: relative;
-    }
-    
-    #jsoneditor {
-      height: 600px;
-      width: 100%;
-    }
-    
-    /* Dual Editor Layout */
-    .dual-editor-container {
+    /* Three Panel Container */
+    .three-panel-container {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 0fr;
       gap: 0;
       height: 600px;
-      display: none;
+      transition: grid-template-columns 0.3s ease;
     }
     
-    .dual-editor-container.active {
-      display: grid;
+    .three-panel-container.show-tree {
+      grid-template-columns: 1fr 1fr 1fr;
     }
     
+    /* Editor Panes */
     .editor-pane {
       border-right: 1px solid var(--border-color);
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      min-width: 0;
     }
     
     .editor-pane:last-child {
       border-right: none;
     }
     
-    .pane-header {
+    /* Pane Toolbar */
+    .pane-toolbar {
       background: var(--bg-gray);
       padding: 8px 12px;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .pane-toolbar.json {
+      border-left: 3px solid var(--primary-blue);
+    }
+    
+    .pane-toolbar.yaml {
+      border-left: 3px solid var(--warning-amber);
+    }
+    
+    .pane-toolbar.tree {
+      border-left: 3px solid var(--success-green);
+    }
+    
+    .pane-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .pane-label {
       font-size: 13px;
       font-weight: 600;
       color: var(--text-medium);
     }
     
-    .pane-header.json {
-      border-left: 3px solid var(--primary-blue);
+    .pane-actions {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
     }
     
-    .pane-header.yaml {
-      border-left: 3px solid var(--warning-amber);
+    .pane-btn {
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      background: white;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-dark);
+      font-weight: 500;
     }
     
-    .pane-content {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
+    .pane-btn:hover {
+      background: var(--bg-gray);
+      border-color: var(--secondary-gray);
     }
     
-    .ace-editor, .text-editor {
-      width: 100%;
-      height: 100%;
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
-      font-size: 14px;
+    .pane-btn.sync {
+      background: var(--primary-blue);
+      color: white;
+      border-color: var(--primary-blue);
     }
     
-    .text-editor {
-      border: none;
-      padding: 12px;
-      resize: none;
-      outline: none;
-      line-height: 1.5;
+    .pane-btn.sync:hover {
+      background: var(--primary-blue-dark);
     }
     
-    /* Sync Status Indicators */
-    .sync-status {
+    /* Validation Badge */
+    .validation-badge {
       font-size: 11px;
       padding: 3px 8px;
       border-radius: 3px;
@@ -330,21 +356,358 @@
       gap: 4px;
     }
     
-    .sync-status.syncing {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    
-    .sync-status.synced {
+    .validation-badge.valid {
       background: #d1fae5;
       color: #065f46;
+      border: 1px solid #a7f3d0;
     }
     
-    .sync-status.error {
+    .validation-badge.invalid {
       background: #fee2e2;
       color: #991b1b;
+      border: 1px solid #fecaca;
     }
     
+    .validation-badge.unknown {
+      background: #e5e7eb;
+      color: #6b7280;
+      border: 1px solid #d1d5db;
+    }
+    
+    /* Code Editor */
+    .code-editor {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .ace-editor {
+      width: 100%;
+      height: 100%;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+      font-size: 14px;
+    }
+    
+    /* Tree Panel */
+    .tree-panel {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .tree-panel.hidden {
+      width: 0;
+      min-width: 0;
+      opacity: 0;
+    }
+    
+    .tree-panel.visible {
+      width: auto;
+      opacity: 1;
+    }
+    
+    .tree-header {
+      background: var(--bg-gray);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-color);
+      border-left: 3px solid var(--success-green);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .tree-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-medium);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .readonly-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      background: #e5e7eb;
+      color: #6b7280;
+      border-radius: 3px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .close-tree {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      background: white;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+      color: var(--text-medium);
+      transition: all 0.2s ease;
+      padding: 0;
+    }
+    
+    .close-tree:hover {
+      background: var(--danger-red);
+      color: white;
+      border-color: var(--danger-red);
+    }
+    
+    #treeView {
+      flex: 1;
+      overflow: auto;
+    }
+    
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+    }
+    
+    .toast {
+      background: white;
+      border-radius: 8px;
+      box-shadow: var(--shadow-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border-left: 4px solid;
+      animation: slideIn 0.3s ease;
+      cursor: pointer;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+    
+    .toast.hiding {
+      animation: slideOut 0.3s ease;
+    }
+    
+    .toast.success {
+      border-left-color: var(--success-green);
+    }
+    
+    .toast.error {
+      border-left-color: var(--danger-red);
+    }
+    
+    .toast.warning {
+      border-left-color: var(--warning-amber);
+    }
+    
+    .toast.info {
+      border-left-color: var(--primary-blue);
+    }
+    
+    .toast-icon {
+      font-size: 20px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    
+    .toast-content {
+      flex: 1;
+    }
+    
+    .toast-message {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dark);
+      line-height: 1.4;
+    }
+    
+    .toast-close {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    
+    .toast-close:hover {
+      color: var(--text-dark);
+    }
+    
+    /* Validation Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal h3 {
+      margin: 0;
+      color: var(--text-dark);
+      font-size: 1.3em;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    
+    .modal-close:hover {
+      color: var(--text-dark);
+    }
+    
+    .modal-body {
+      color: var(--text-medium);
+    }
+    
+    .validation-status-large {
+      padding: 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+    }
+    
+    .validation-status-large.valid {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    
+    .validation-status-large.invalid {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    
+    .validation-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .stat-box {
+      background: var(--bg-gray);
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+    
+    .stat-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    .error-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    
+    .error-item {
+      background: #fee2e2;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--danger-red);
+    }
+    
+    .error-location {
+      font-size: 12px;
+      color: var(--danger-red-dark);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .error-message {
+      font-size: 14px;
+      color: var(--text-dark);
+      margin: 0;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+    
+    /* Help Button */
     .help-button {
       position: absolute;
       top: 12px;
@@ -457,85 +820,6 @@
       line-height: 1.5;
     }
     
-    .validation-status {
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 500;
-      display: none;
-      margin-left: auto;
-    }
-    
-    .validation-status.valid {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .validation-status.invalid {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    /* Warning Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-    }
-    
-    .modal-overlay.active {
-      display: flex;
-    }
-    
-    .modal {
-      background: white;
-      border-radius: 8px;
-      padding: 24px;
-      max-width: 500px;
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .modal h3 {
-      margin: 0 0 16px 0;
-      color: var(--text-dark);
-    }
-    
-    .modal p {
-      margin: 0 0 16px 0;
-      color: var(--text-medium);
-      line-height: 1.6;
-    }
-    
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-    }
-    
-    .modal-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
-      font-size: 14px;
-      color: var(--text-medium);
-    }
-    
     footer {
       text-align: center;
       color: var(--text-medium);
@@ -554,6 +838,31 @@
       text-decoration: underline;
     }
     
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .three-panel-container {
+        grid-template-columns: 1fr 1fr;
+        height: 500px;
+      }
+      
+      .three-panel-container.show-tree {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      
+      .tree-panel.visible {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        background: white;
+        width: 100%;
+        height: 100vh;
+      }
+    }
+    
     @media (max-width: 768px) {
       .container {
         padding: 12px;
@@ -567,7 +876,7 @@
         font-size: 1.4em;
       }
       
-      .toolbar {
+      .main-toolbar {
         padding: 12px 16px;
       }
       
@@ -580,22 +889,27 @@
         font-size: 13px;
       }
       
-      #jsoneditor, .dual-editor-container {
-        height: 450px;
-      }
-      
-      .dual-editor-container {
+      .three-panel-container {
         grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
+        height: auto;
       }
       
       .editor-pane {
         border-right: none;
         border-bottom: 1px solid var(--border-color);
+        min-height: 300px;
       }
       
       .editor-pane:last-child {
         border-bottom: none;
+      }
+      
+      .pane-actions {
+        width: 100%;
+      }
+      
+      .pane-btn {
+        flex: 1;
       }
       
       .help-button {
@@ -607,6 +921,10 @@
       .features-grid {
         grid-template-columns: 1fr;
       }
+      
+      .toast-container {
+        max-width: calc(100vw - 40px);
+      }
     }
   </style>
 </head>
@@ -614,11 +932,11 @@
   <div class="container">
     <header>
       <h1>JSON/YAML Editor</h1>
-      <p><strong>Professional</strong> dual-format editing tool by MR901.CO.IN</p>
     </header>
     
     <div class="main-content">
-      <div class="toolbar">
+      <!-- Main Toolbar -->
+      <div class="main-toolbar">
         <div class="toolbar-section">
           <span class="toolbar-section-label">File</span>
           <div class="button-group">
@@ -652,153 +970,145 @@
         <div class="divider"></div>
         
         <div class="toolbar-section">
-          <span class="toolbar-section-label">Edit</span>
+          <span class="toolbar-section-label">View</span>
           <div class="button-group">
-            <button onclick="formatContent()">
-              <span>⚡</span> Format
+            <button onclick="toggleTreeView()">
+              <span>🌲</span> Tree View
             </button>
-            <button onclick="compactContent()">
-              <span>▣</span> Compact
-            </button>
-            <button onclick="validateContent()">
-              <span>✓</span> Validate
-            </button>
-            <button onclick="repairContent()">
-              <span>⚙</span> Repair
-            </button>
-          </div>
-        </div>
-        
-        <div class="divider"></div>
-        
-        <div class="toolbar-section">
-          <span class="toolbar-section-label">Actions</span>
-          <div class="button-group">
             <button onclick="loadExample()">
               <span>◈</span> Example
             </button>
-            <button onclick="clearEditor()" class="danger">
+            <button onclick="clearEditors()" class="danger">
               <span>×</span> Clear
             </button>
           </div>
         </div>
-        
-        <span class="validation-status" id="validationStatus"></span>
       </div>
       
-      <div class="editor-container">
-        <button class="help-button" onclick="toggleInfo()" data-tooltip="Help & Shortcuts" aria-label="Toggle help panel">
-          ?
-        </button>
-        
-        <!-- Original JSONEditor (Tree Mode) -->
-        <div id="jsoneditor"></div>
-        
-        <!-- Dual Editor (Code/Text Modes) -->
-        <div id="dualEditorContainer" class="dual-editor-container">
-          <div class="editor-pane">
-            <div class="pane-header json">
-              <span>JSON Format</span>
-              <span class="sync-status synced" id="jsonSyncStatus">✓ Synced</span>
+      <!-- Three Panel Container -->
+      <div id="threePanelContainer" class="three-panel-container">
+        <!-- JSON Pane -->
+        <div class="editor-pane json-pane">
+          <div class="pane-toolbar json">
+            <div class="pane-info">
+              <span class="pane-label">JSON</span>
+              <span class="validation-badge unknown" id="jsonValidation">—</span>
             </div>
-            <div class="pane-content">
-              <div id="jsonAceEditor" class="ace-editor"></div>
-              <textarea id="jsonTextEditor" class="text-editor" style="display:none;"></textarea>
+            <div class="pane-actions">
+              <button class="pane-btn" onclick="formatJSON()">Format</button>
+              <button class="pane-btn" onclick="compactJSON()">Compact</button>
+              <button class="pane-btn" onclick="validateJSON()">Validate</button>
+              <button class="pane-btn" onclick="repairJSON()">Repair</button>
+              <button class="pane-btn sync" onclick="syncJSONtoYAML()">Sync →</button>
             </div>
           </div>
-          <div class="editor-pane">
-            <div class="pane-header yaml">
-              <span>YAML Format</span>
-              <span class="sync-status synced" id="yamlSyncStatus">✓ Synced</span>
+          <div class="code-editor">
+            <div id="jsonEditor" class="ace-editor"></div>
+          </div>
+        </div>
+        
+        <!-- YAML Pane -->
+        <div class="editor-pane yaml-pane">
+          <div class="pane-toolbar yaml">
+            <div class="pane-info">
+              <span class="pane-label">YAML</span>
+              <span class="validation-badge unknown" id="yamlValidation">—</span>
             </div>
-            <div class="pane-content">
-              <div id="yamlAceEditor" class="ace-editor"></div>
-              <textarea id="yamlTextEditor" class="text-editor" style="display:none;"></textarea>
+            <div class="pane-actions">
+              <button class="pane-btn" onclick="formatYAML()">Format</button>
+              <button class="pane-btn" onclick="compactYAML()">Compact</button>
+              <button class="pane-btn" onclick="validateYAML()">Validate</button>
+              <button class="pane-btn" onclick="repairYAML()">Repair</button>
+              <button class="pane-btn sync" onclick="syncYAMLtoJSON()">← Sync</button>
             </div>
           </div>
+          <div class="code-editor">
+            <div id="yamlEditor" class="ace-editor"></div>
+          </div>
+        </div>
+        
+        <!-- Tree Panel -->
+        <div class="tree-panel hidden" id="treePanel">
+          <div class="tree-header">
+            <div class="tree-label">
+              <span>Tree View</span>
+              <span class="readonly-badge">Read-only</span>
+            </div>
+            <button class="close-tree" onclick="toggleTreeView()">×</button>
+          </div>
+          <div id="treeView"></div>
         </div>
       </div>
       
+      <!-- Help Button -->
+      <button class="help-button" onclick="toggleInfo()" data-tooltip="Help & Shortcuts" aria-label="Toggle help panel">
+        ?
+      </button>
+      
+      <!-- Info Panel -->
       <div class="info-panel" id="infoPanel">
-        <h3>Features & Capabilities</h3>
+        <h3>New Features & Controls</h3>
         
         <div class="features-grid">
           <div class="feature-box">
-            <strong>Dual Format Support</strong>
-            <p>Edit in both JSON and YAML formats with live bidirectional synchronization</p>
+            <strong>Manual Sync Control</strong>
+            <p>Edit JSON and YAML independently. Click "Sync →" or "← Sync" to transfer changes between editors.</p>
           </div>
           <div class="feature-box">
-            <strong>Multiple Editing Modes</strong>
-            <p>Switch between Tree view, Code editor (dual pane), and Text mode</p>
+            <strong>Independent Formatting</strong>
+            <p>Each editor has its own Format and Compact buttons. Changes only affect that specific pane.</p>
           </div>
           <div class="feature-box">
-            <strong>Auto Format Detection</strong>
-            <p>Automatically detects JSON or YAML when loading files</p>
+            <strong>Tree View</strong>
+            <p>Click "Tree View" to see a read-only visual representation of your data structure.</p>
           </div>
           <div class="feature-box">
-            <strong>Live Synchronization</strong>
-            <p>Changes in one format automatically update the other in real-time</p>
+            <strong>Enhanced Validation</strong>
+            <p>Live validation badges show status. Click Validate for detailed results with line numbers.</p>
           </div>
           <div class="feature-box">
-            <strong>JSON Schema Validation</strong>
-            <p>Automatic validation with visual error indicators</p>
+            <strong>Auto-Repair</strong>
+            <p>Click Repair to automatically fix common syntax errors in JSON or YAML.</p>
           </div>
           <div class="feature-box">
-            <strong>Search & Replace</strong>
-            <p>Find and replace text throughout your document</p>
+            <strong>Toast Notifications</strong>
+            <p>Professional feedback for all operations with clear success/error messages.</p>
           </div>
         </div>
         
-        <h3>YAML Support</h3>
+        <h3>How to Use</h3>
         <ul>
-          <li><strong>Load YAML files:</strong> Automatically detected and converted for editing</li>
-          <li><strong>Save as YAML:</strong> Export your data in YAML format</li>
-          <li><strong>Dual editor view:</strong> See JSON and YAML side-by-side in Code/Text modes</li>
-          <li><strong>Known limitation:</strong> YAML comments are not preserved during editing</li>
-          <li><strong>Advanced features:</strong> Anchors and multi-line strings are simplified</li>
+          <li><strong>Load Files:</strong> Click Load to import JSON or YAML files (auto-detected)</li>
+          <li><strong>Edit Independently:</strong> Make changes in JSON or YAML editor without affecting the other</li>
+          <li><strong>Manual Sync:</strong> Click sync buttons when you want to transfer changes</li>
+          <li><strong>Format/Compact:</strong> Use pane-specific buttons to format or minify content</li>
+          <li><strong>Validate:</strong> Check syntax and see detailed validation results</li>
+          <li><strong>Tree View:</strong> Visualize structure in a read-only tree (updates when opened)</li>
+          <li><strong>Save:</strong> Choose format (JSON/YAML) and save to file</li>
         </ul>
         
         <h3>Keyboard Shortcuts</h3>
         <ul>
-          <li><strong>Ctrl+Z / Cmd+Z:</strong> Undo last action</li>
-          <li><strong>Ctrl+Y / Cmd+Shift+Z:</strong> Redo action</li>
-          <li><strong>Ctrl+F / Cmd+F:</strong> Search in document</li>
-          <li><strong>Ctrl+H / Cmd+H:</strong> Search and replace</li>
-          <li><strong>Ctrl+D / Cmd+D:</strong> Duplicate field or value</li>
-          <li><strong>Ctrl+Enter / Cmd+Enter:</strong> Open link or color picker</li>
-          <li><strong>Alt+End:</strong> Move to last field</li>
-          <li><strong>Ctrl+M / Cmd+M:</strong> Show actions menu</li>
-        </ul>
-        
-        <h3>Tips</h3>
-        <ul>
-          <li>Use Tree mode for visual editing with drag & drop</li>
-          <li>Use Code/Text mode to see both JSON and YAML simultaneously</li>
-          <li>Switch formats anytime using the JSON/YAML toggle</li>
-          <li>The editor auto-detects format when loading files</li>
-          <li>Validation works seamlessly for both formats</li>
+          <li><strong>Ctrl+Z / Cmd+Z:</strong> Undo in active editor</li>
+          <li><strong>Ctrl+Y / Cmd+Shift+Z:</strong> Redo in active editor</li>
+          <li><strong>Ctrl+F / Cmd+F:</strong> Search in active editor</li>
+          <li><strong>Ctrl+H / Cmd+H:</strong> Search and replace in active editor</li>
         </ul>
       </div>
     </div>
     
-    <!-- Warning Modal -->
-    <div id="yamlWarningModal" class="modal-overlay">
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Validation Modal -->
+    <div id="validationModal" class="modal-overlay">
       <div class="modal">
-        <h3>⚠️ YAML Format Limitations</h3>
-        <p>Please note the following limitations when working with YAML:</p>
-        <ul style="margin: 12px 0; padding-left: 24px; color: var(--text-medium);">
-          <li>Comments are not preserved during editing</li>
-          <li>Anchors and aliases are expanded to their values</li>
-          <li>Multi-line string formatting may be simplified</li>
-          <li>Multiple documents in one file are not supported</li>
-        </ul>
-        <p>The editor is best suited for structural editing. Use Tree mode for the best experience.</p>
-        <div class="modal-checkbox">
-          <input type="checkbox" id="dontShowAgain">
-          <label for="dontShowAgain">Don't show this again</label>
+        <div class="modal-header">
+          <h3 id="modalTitle">Validation Results</h3>
+          <button class="modal-close" onclick="closeValidationModal()">×</button>
         </div>
-        <div class="modal-actions">
-          <button onclick="closeWarningModal()" class="primary">I Understand</button>
+        <div class="modal-body" id="modalBody">
+          <!-- Content populated by JavaScript -->
         </div>
       </div>
     </div>
@@ -810,16 +1120,11 @@
 
   <script>
     // ============================================================================
-    // PHASE 1: Core Infrastructure and State Management
+    // Global State Management
     // ============================================================================
     
-    // Global editor state
     const editorState = {
-      currentFormat: 'json',           // 'json' or 'yaml'
-      lastEditedPane: 'json',           // 'json', 'yaml', or 'tree'
-      currentMode: 'tree',              // 'tree', 'code', or 'text'
-      autoDetect: true,
-      syncLock: false,                  // Prevent infinite sync loops
+      currentFormat: 'json',
       yamlOptions: {
         indent: 2,
         lineWidth: 120,
@@ -828,33 +1133,81 @@
         flowLevel: -1,
         quotingType: '"',
         forceQuotes: false
-      },
-      debounceTimers: {
-        json: null,
-        yaml: null
-      },
-      warningShown: localStorage.getItem('yamlWarningShown') === 'true'
+      }
     };
     
     // Ace editor instances
     let jsonAce = null;
     let yamlAce = null;
+    let treeEditor = null;
     
     // ============================================================================
-    // Format Detection Algorithm
+    // Initialization
+    // ============================================================================
+    
+    function initializeEditors() {
+      if (typeof ace === 'undefined') {
+        console.error('Ace editor not available');
+        return;
+      }
+      
+      // JSON Ace Editor
+      jsonAce = ace.edit('jsonEditor');
+      jsonAce.setTheme('ace/theme/jsoneditor');
+      jsonAce.session.setMode('ace/mode/json');
+      jsonAce.setOptions({
+        fontSize: '14px',
+        showPrintMargin: false,
+        highlightActiveLine: true,
+        showGutter: true,
+        displayIndentGuides: true,
+        wrap: true
+      });
+      
+      // Update validation badge on blur
+      jsonAce.on('blur', () => updateValidationBadge('json'));
+      
+      // YAML Ace Editor
+      yamlAce = ace.edit('yamlEditor');
+      yamlAce.setTheme('ace/theme/jsoneditor');
+      yamlAce.session.setMode('ace/mode/yaml');
+      yamlAce.setOptions({
+        fontSize: '14px',
+        showPrintMargin: false,
+        highlightActiveLine: true,
+        showGutter: true,
+        displayIndentGuides: true,
+        wrap: true
+      });
+      
+      // Update validation badge on blur
+      yamlAce.on('blur', () => updateValidationBadge('yaml'));
+      
+      // Initialize Tree Editor (read-only)
+      const treeContainer = document.getElementById('treeView');
+      treeEditor = new JSONEditor(treeContainer, {
+        mode: 'view',
+        navigationBar: false,
+        statusBar: false,
+        mainMenuBar: false
+      });
+      
+      console.log('Editors initialized successfully');
+    }
+    
+    // ============================================================================
+    // Format Detection & Conversion
     // ============================================================================
     
     function detectFormat(text, filename = '') {
       text = text.trim();
       
-      // Check file extension first
       if (filename) {
         const ext = filename.toLowerCase().split('.').pop();
         if (ext === 'json') return 'json';
         if (ext === 'yaml' || ext === 'yml') return 'yaml';
       }
       
-      // Try JSON first (stricter)
       if (text.startsWith('{') || text.startsWith('[')) {
         try {
           JSON.parse(text);
@@ -864,13 +1217,12 @@
         }
       }
       
-      // YAML indicators
       const yamlPatterns = [
-        /^---/m,                        // Document separator
-        /^\w+:\s*$/m,                   // Key without quotes
-        /^\s+-\s+\w+:/m,                // List items with keys
-        /^[^"{\[]\w+:\s+[^"{\[]/m,      // Unquoted key-value
-        /\n\s{2,}\w+:/,                 // Indented keys
+        /^---/m,
+        /^\w+:\s*$/m,
+        /^\s+-\s+\w+:/m,
+        /^[^"{\[]\w+:\s+[^"{\[]/m,
+        /\n\s{2,}\w+:/,
       ];
       
       const yamlScore = yamlPatterns.filter(p => p.test(text)).length;
@@ -880,11 +1232,10 @@
           jsyaml.load(text);
           return 'yaml';
         } catch (e) {
-          // Continue to final attempts
+          // Continue
         }
       }
       
-      // Final parsing attempts
       try {
         JSON.parse(text);
         return 'json';
@@ -897,10 +1248,6 @@
         }
       }
     }
-    
-    // ============================================================================
-    // Format Conversion Utilities
-    // ============================================================================
     
     function jsonToYaml(jsonObj) {
       try {
@@ -924,319 +1271,519 @@
     }
     
     // ============================================================================
-    // PHASE 2: Dual Editor Initialization
+    // Toast Notification System
     // ============================================================================
     
-    // Create JSONEditor (Tree Mode)
-    const container = document.getElementById('jsoneditor');
-    const options = {
-      mode: 'tree',
-      modes: ['tree', 'code', 'text'],
-      search: true,
-      navigationBar: true,
-      statusBar: true,
-      onChange: function() {
-        if (editorState.currentMode === 'tree') {
-          updateValidationStatus();
-          editorState.lastEditedPane = 'tree';
-        }
-      },
-      onValidationError: function(errors) {
-        if (errors.length > 0) {
-          showValidationStatus('invalid', `${errors.length} validation error(s)`);
-        }
-      },
-      onModeChange: function(newMode, oldMode) {
-        console.log('Mode switched from', oldMode, 'to', newMode);
-        handleModeChange(newMode, oldMode);
+    function showToast(message, type = 'info', duration = 3000) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icons = {
+        success: '✓',
+        error: '✗',
+        warning: '⚠',
+        info: 'ℹ'
+      };
+      
+      toast.innerHTML = `
+        <div class="toast-icon">${icons[type] || 'ℹ'}</div>
+        <div class="toast-content">
+          <p class="toast-message">${message}</p>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+      `;
+      
+      container.appendChild(toast);
+      
+      // Auto-dismiss for success messages
+      if (type === 'success' && duration > 0) {
+        setTimeout(() => {
+          toast.classList.add('hiding');
+          setTimeout(() => toast.remove(), 300);
+        }, duration);
       }
-    };
+      
+      // Click to dismiss
+      toast.addEventListener('click', (e) => {
+        if (e.target !== toast.querySelector('.toast-close')) {
+          toast.classList.add('hiding');
+          setTimeout(() => toast.remove(), 300);
+        }
+      });
+    }
     
-    const editor = new JSONEditor(container, options);
+    // ============================================================================
+    // Validation Functions
+    // ============================================================================
     
-    // Initialize Ace editors for Code mode
-    function initializeAceEditors() {
-      if (typeof ace === 'undefined') {
-        console.error('Ace editor not available');
+    function updateValidationBadge(pane) {
+      const badge = document.getElementById(`${pane}Validation`);
+      if (!badge) return;
+      
+      try {
+        if (pane === 'json') {
+          const text = jsonAce.getValue();
+          if (text.trim()) {
+            JSON.parse(text);
+            badge.className = 'validation-badge valid';
+            badge.textContent = '✓ Valid';
+          } else {
+            badge.className = 'validation-badge unknown';
+            badge.textContent = '—';
+          }
+        } else if (pane === 'yaml') {
+          const text = yamlAce.getValue();
+          if (text.trim()) {
+            yamlToJson(text);
+            badge.className = 'validation-badge valid';
+            badge.textContent = '✓ Valid';
+          } else {
+            badge.className = 'validation-badge unknown';
+            badge.textContent = '—';
+          }
+        }
+      } catch (error) {
+        badge.className = 'validation-badge invalid';
+        badge.textContent = '✗ Invalid';
+      }
+    }
+    
+    function validateJSON() {
+      const text = jsonAce.getValue();
+      
+      if (!text.trim()) {
+        showToast('JSON editor is empty', 'warning');
         return;
       }
       
-      // JSON Ace Editor
-      jsonAce = ace.edit('jsonAceEditor');
-      jsonAce.setTheme('ace/theme/jsoneditor');
-      jsonAce.session.setMode('ace/mode/json');
-      jsonAce.setOptions({
-        fontSize: '14px',
-        showPrintMargin: false,
-        highlightActiveLine: true,
-        showGutter: true,
-        displayIndentGuides: true
-      });
-      jsonAce.on('change', debounce(() => syncJsonToYaml(), 300));
-      
-      // YAML Ace Editor
-      yamlAce = ace.edit('yamlAceEditor');
-      yamlAce.setTheme('ace/theme/jsoneditor');
-      yamlAce.session.setMode('ace/mode/yaml');
-      yamlAce.setOptions({
-        fontSize: '14px',
-        showPrintMargin: false,
-        highlightActiveLine: true,
-        showGutter: true,
-        displayIndentGuides: true
-      });
-      yamlAce.on('change', debounce(() => syncYamlToJson(), 300));
-      
-      console.log('Ace editors initialized');
+      try {
+        const parsed = JSON.parse(text);
+        const lines = text.split('\n').length;
+        const chars = text.length;
+        
+        showValidationModal('JSON Validation', true, {
+          lines,
+          chars,
+          size: `${(chars / 1024).toFixed(2)} KB`
+        });
+        
+        updateValidationBadge('json');
+        showToast('JSON is valid!', 'success');
+      } catch (error) {
+        const match = error.message.match(/position (\d+)/);
+        const position = match ? parseInt(match[1]) : null;
+        let lineNumber = null;
+        
+        if (position !== null) {
+          const upToError = text.substring(0, position);
+          lineNumber = upToError.split('\n').length;
+        }
+        
+        showValidationModal('JSON Validation', false, {
+          errors: [{
+            line: lineNumber,
+            message: error.message
+          }]
+        });
+        
+        updateValidationBadge('json');
+      }
     }
     
-    // Initialize Text mode editors
-    function initializeTextEditors() {
-      const jsonTextarea = document.getElementById('jsonTextEditor');
-      const yamlTextarea = document.getElementById('yamlTextEditor');
+    function validateYAML() {
+      const text = yamlAce.getValue();
       
-      jsonTextarea.addEventListener('input', debounce(() => syncJsonToYaml(), 300));
-      yamlTextarea.addEventListener('input', debounce(() => syncYamlToJson(), 300));
-    }
-    
-    // Debounce helper
-    function debounce(func, wait) {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
-    
-    // ============================================================================
-    // PHASE 3: Bidirectional Sync Logic
-    // ============================================================================
-    
-    function syncJsonToYaml() {
-      if (editorState.syncLock) return;
+      if (!text.trim()) {
+        showToast('YAML editor is empty', 'warning');
+        return;
+      }
       
       try {
-        const jsonText = editorState.currentMode === 'code' 
-          ? jsonAce.getValue() 
-          : document.getElementById('jsonTextEditor').value;
+        const parsed = yamlToJson(text);
+        const lines = text.split('\n').length;
+        const chars = text.length;
         
-        setSyncStatus('json', 'syncing');
+        showValidationModal('YAML Validation', true, {
+          lines,
+          chars,
+          size: `${(chars / 1024).toFixed(2)} KB`
+        });
         
-        // Parse JSON
+        updateValidationBadge('yaml');
+        showToast('YAML is valid!', 'success');
+      } catch (error) {
+        const match = error.message.match(/line (\d+)/i);
+        const lineNumber = match ? parseInt(match[1]) : null;
+        
+        showValidationModal('YAML Validation', false, {
+          errors: [{
+            line: lineNumber,
+            message: error.message
+          }]
+        });
+        
+        updateValidationBadge('yaml');
+      }
+    }
+    
+    function showValidationModal(title, isValid, data) {
+      const modal = document.getElementById('validationModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+      
+      modalTitle.textContent = title;
+      
+      if (isValid) {
+        modalBody.innerHTML = `
+          <div class="validation-status-large valid">
+            <span style="font-size: 24px;">✓</span>
+            <span>Valid Syntax</span>
+          </div>
+          <div class="validation-stats">
+            <div class="stat-box">
+              <div class="stat-label">Lines</div>
+              <div class="stat-value">${data.lines}</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Characters</div>
+              <div class="stat-value">${data.chars}</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Size</div>
+              <div class="stat-value">${data.size}</div>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button onclick="closeValidationModal()" class="primary">Close</button>
+          </div>
+        `;
+      } else {
+        const errorItems = data.errors.map(err => `
+          <li class="error-item">
+            ${err.line ? `<div class="error-location">Line ${err.line}</div>` : ''}
+            <p class="error-message">${err.message}</p>
+          </li>
+        `).join('');
+        
+        modalBody.innerHTML = `
+          <div class="validation-status-large invalid">
+            <span style="font-size: 24px;">✗</span>
+            <span>Invalid Syntax</span>
+          </div>
+          <h4 style="margin-top: 0;">Errors Found:</h4>
+          <ul class="error-list">${errorItems}</ul>
+          <div class="modal-actions">
+            <button onclick="closeValidationModal()" class="primary">Close</button>
+          </div>
+        `;
+      }
+      
+      modal.classList.add('active');
+    }
+    
+    function closeValidationModal() {
+      document.getElementById('validationModal').classList.remove('active');
+    }
+    
+    // ============================================================================
+    // Format & Compact Functions (Per Pane)
+    // ============================================================================
+    
+    function formatJSON() {
+      try {
+        const text = jsonAce.getValue();
+        const parsed = JSON.parse(text);
+        const formatted = JSON.stringify(parsed, null, 2);
+        jsonAce.setValue(formatted, -1);
+        updateValidationBadge('json');
+        showToast('JSON formatted successfully', 'success');
+      } catch (error) {
+        showToast('Cannot format: ' + error.message, 'error', 0);
+      }
+    }
+    
+    function compactJSON() {
+      try {
+        const text = jsonAce.getValue();
+        const parsed = JSON.parse(text);
+        const compact = JSON.stringify(parsed);
+        jsonAce.setValue(compact, -1);
+        updateValidationBadge('json');
+        showToast('JSON compacted successfully', 'success');
+      } catch (error) {
+        showToast('Cannot compact: ' + error.message, 'error', 0);
+      }
+    }
+    
+    function formatYAML() {
+      try {
+        const text = yamlAce.getValue();
+        const parsed = yamlToJson(text);
+        const formatted = jsonToYaml(parsed);
+        yamlAce.setValue(formatted, -1);
+        updateValidationBadge('yaml');
+        showToast('YAML formatted successfully', 'success');
+      } catch (error) {
+        showToast('Cannot format: ' + error.message, 'error', 0);
+      }
+    }
+    
+    function compactYAML() {
+      try {
+        const text = yamlAce.getValue();
+        const parsed = yamlToJson(text);
+        const compact = jsyaml.dump(parsed, { flowLevel: 0, indent: 0 });
+        yamlAce.setValue(compact, -1);
+        updateValidationBadge('yaml');
+        showToast('YAML compacted successfully', 'success');
+      } catch (error) {
+        showToast('Cannot compact: ' + error.message, 'error', 0);
+      }
+    }
+    
+    function repairJSON() {
+      try {
+        const text = jsonAce.getValue();
+        const parsed = JSON.parse(text);
+        const repaired = JSON.stringify(parsed, null, 2);
+        jsonAce.setValue(repaired, -1);
+        updateValidationBadge('json');
+        showToast('JSON repaired successfully', 'success');
+      } catch (error) {
+        showToast('Cannot repair: ' + error.message, 'error', 0);
+      }
+    }
+    
+    function repairYAML() {
+      try {
+        const text = yamlAce.getValue();
+        const parsed = yamlToJson(text);
+        const repaired = jsonToYaml(parsed);
+        yamlAce.setValue(repaired, -1);
+        updateValidationBadge('yaml');
+        showToast('YAML repaired successfully', 'success');
+      } catch (error) {
+        showToast('Cannot repair: ' + error.message, 'error', 0);
+      }
+    }
+    
+    // ============================================================================
+    // Manual Sync Functions
+    // ============================================================================
+    
+    function syncJSONtoYAML() {
+      try {
+        const jsonText = jsonAce.getValue();
+        
+        if (!jsonText.trim()) {
+          showToast('JSON editor is empty', 'warning');
+          return;
+        }
+        
         const jsonObj = JSON.parse(jsonText);
-        
-        // Convert to YAML
         const yamlText = jsonToYaml(jsonObj);
         
-        // Update YAML pane
-        editorState.syncLock = true;
-        if (editorState.currentMode === 'code') {
-          yamlAce.setValue(yamlText, -1);
-        } else {
-          document.getElementById('yamlTextEditor').value = yamlText;
-        }
-        editorState.syncLock = false;
+        yamlAce.setValue(yamlText, -1);
         
-        editorState.lastEditedPane = 'json';
-        setSyncStatus('json', 'synced');
-        setSyncStatus('yaml', 'synced');
+        updateValidationBadge('json');
+        updateValidationBadge('yaml');
         
+        showToast('Synced JSON → YAML', 'success');
       } catch (error) {
-        console.error('Sync error (JSON to YAML):', error);
-        setSyncStatus('json', 'error', error.message);
+        showToast('Sync failed: ' + error.message, 'error', 0);
       }
     }
     
-    function syncYamlToJson() {
-      if (editorState.syncLock) return;
-      
+    function syncYAMLtoJSON() {
       try {
-        const yamlText = editorState.currentMode === 'code' 
-          ? yamlAce.getValue() 
-          : document.getElementById('yamlTextEditor').value;
+        const yamlText = yamlAce.getValue();
         
-        setSyncStatus('yaml', 'syncing');
+        if (!yamlText.trim()) {
+          showToast('YAML editor is empty', 'warning');
+          return;
+        }
         
-        // Parse YAML
         const jsonObj = yamlToJson(yamlText);
-        
-        // Convert to JSON
         const jsonText = JSON.stringify(jsonObj, null, 2);
         
-        // Update JSON pane
-        editorState.syncLock = true;
-        if (editorState.currentMode === 'code') {
-          jsonAce.setValue(jsonText, -1);
-        } else {
-          document.getElementById('jsonTextEditor').value = jsonText;
-        }
-        editorState.syncLock = false;
+        jsonAce.setValue(jsonText, -1);
         
-        editorState.lastEditedPane = 'yaml';
-        setSyncStatus('yaml', 'synced');
-        setSyncStatus('json', 'synced');
+        updateValidationBadge('yaml');
+        updateValidationBadge('json');
         
+        showToast('Synced YAML → JSON', 'success');
       } catch (error) {
-        console.error('Sync error (YAML to JSON):', error);
-        setSyncStatus('yaml', 'error', error.message);
-      }
-    }
-    
-    function setSyncStatus(pane, status, message = '') {
-      const statusEl = document.getElementById(`${pane}SyncStatus`);
-      if (!statusEl) return;
-      
-      statusEl.className = `sync-status ${status}`;
-      
-      switch (status) {
-        case 'syncing':
-          statusEl.textContent = '⟳ Syncing...';
-          break;
-        case 'synced':
-          statusEl.textContent = '✓ Synced';
-          break;
-        case 'error':
-          statusEl.textContent = '✗ Error';
-          statusEl.title = message;
-          break;
+        showToast('Sync failed: ' + error.message, 'error', 0);
       }
     }
     
     // ============================================================================
-    // PHASE 4: Mode Switching
+    // Tree View Functions
     // ============================================================================
     
-    function handleModeChange(newMode, oldMode) {
-      editorState.currentMode = newMode;
+    function toggleTreeView() {
+      const container = document.getElementById('threePanelContainer');
+      const panel = document.getElementById('treePanel');
       
-      const jsoneditorEl = document.getElementById('jsoneditor');
-      const dualEditorEl = document.getElementById('dualEditorContainer');
-      
-      if (newMode === 'tree') {
-        // Show tree editor
-        jsoneditorEl.style.display = 'block';
-        dualEditorEl.classList.remove('active');
-        
-        // Sync data from dual editors to tree if coming from code/text
-        if (oldMode === 'code' || oldMode === 'text') {
-          syncToTreeMode();
+      if (panel.classList.contains('hidden')) {
+        // Show tree view - load from JSON editor
+        try {
+          const jsonText = jsonAce.getValue();
+          if (jsonText.trim()) {
+            const data = JSON.parse(jsonText);
+            treeEditor.set(data);
+            treeEditor.expandAll();
+          } else {
+            showToast('JSON editor is empty', 'warning');
+            return;
+          }
+        } catch (error) {
+          showToast('Cannot display tree: Invalid JSON', 'error', 0);
+          return;
         }
         
-      } else if (newMode === 'code') {
-        // Show dual Ace editors
-        jsoneditorEl.style.display = 'none';
-        dualEditorEl.classList.add('active');
-        
-        // Show Ace editors, hide textareas
-        document.getElementById('jsonAceEditor').style.display = 'block';
-        document.getElementById('yamlAceEditor').style.display = 'block';
-        document.getElementById('jsonTextEditor').style.display = 'none';
-        document.getElementById('yamlTextEditor').style.display = 'none';
-        
-        // Initialize if needed
-        if (!jsonAce || !yamlAce) {
-          initializeAceEditors();
-        }
-        
-        // Sync data from tree to dual editors
-        syncFromTreeMode();
-        
-        // Resize Ace editors
-        setTimeout(() => {
-          if (jsonAce) jsonAce.resize();
-          if (yamlAce) yamlAce.resize();
-        }, 100);
-        
-      } else if (newMode === 'text') {
-        // Show dual textareas
-        jsoneditorEl.style.display = 'none';
-        dualEditorEl.classList.add('active');
-        
-        // Show textareas, hide Ace editors
-        document.getElementById('jsonAceEditor').style.display = 'none';
-        document.getElementById('yamlAceEditor').style.display = 'none';
-        document.getElementById('jsonTextEditor').style.display = 'block';
-        document.getElementById('yamlTextEditor').style.display = 'block';
-        
-        // Initialize if needed
-        initializeTextEditors();
-        
-        // Sync data from tree to dual editors
-        syncFromTreeMode();
+        panel.classList.remove('hidden');
+        panel.classList.add('visible');
+        container.classList.add('show-tree');
+      } else {
+        // Hide tree view
+        panel.classList.remove('visible');
+        panel.classList.add('hidden');
+        container.classList.remove('show-tree');
       }
     }
     
-    function syncFromTreeMode() {
+    // ============================================================================
+    // File Operations
+    // ============================================================================
+    
+    document.getElementById('loadFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const content = event.target.result;
+        const detectedFormat = detectFormat(content, file.name);
+        
+        try {
+          let jsonData;
+          
+          if (detectedFormat === 'yaml') {
+            jsonData = yamlToJson(content);
+            editorState.currentFormat = 'yaml';
+            
+            // Load into YAML editor
+            yamlAce.setValue(content, -1);
+            
+            // Convert and load into JSON editor
+            const jsonText = JSON.stringify(jsonData, null, 2);
+            jsonAce.setValue(jsonText, -1);
+            
+            showToast('YAML file loaded successfully', 'success');
+          } else if (detectedFormat === 'json') {
+            jsonData = JSON.parse(content);
+            editorState.currentFormat = 'json';
+            
+            // Load into JSON editor
+            jsonAce.setValue(content, -1);
+            
+            // Convert and load into YAML editor
+            const yamlText = jsonToYaml(jsonData);
+            yamlAce.setValue(yamlText, -1);
+            
+            showToast('JSON file loaded successfully', 'success');
+          } else {
+            try {
+              jsonData = JSON.parse(content);
+              editorState.currentFormat = 'json';
+              jsonAce.setValue(content, -1);
+              yamlAce.setValue(jsonToYaml(jsonData), -1);
+            } catch (e) {
+              jsonData = yamlToJson(content);
+              editorState.currentFormat = 'yaml';
+              yamlAce.setValue(content, -1);
+              jsonAce.setValue(JSON.stringify(jsonData, null, 2), -1);
+            }
+            showToast('File loaded successfully', 'success');
+          }
+          
+          updateFormatUI();
+          updateValidationBadge('json');
+          updateValidationBadge('yaml');
+          
+        } catch (error) {
+          showToast('Error loading file: ' + error.message, 'error', 0);
+        }
+      };
+      
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+    
+    function saveFile() {
       try {
-        const jsonObj = editor.get();
-        const jsonText = JSON.stringify(jsonObj, null, 2);
-        const yamlText = jsonToYaml(jsonObj);
+        let content, mimeType, defaultExt;
         
-        editorState.syncLock = true;
-        
-        if (editorState.currentMode === 'code') {
-          if (jsonAce) jsonAce.setValue(jsonText, -1);
-          if (yamlAce) yamlAce.setValue(yamlText, -1);
+        if (editorState.currentFormat === 'yaml') {
+          content = yamlAce.getValue();
+          
+          if (!content.trim()) {
+            showToast('YAML editor is empty', 'warning');
+            return;
+          }
+          
+          // Validate before saving
+          yamlToJson(content);
+          
+          mimeType = 'text/yaml;charset=utf-8';
+          defaultExt = '.yaml';
         } else {
-          document.getElementById('jsonTextEditor').value = jsonText;
-          document.getElementById('yamlTextEditor').value = yamlText;
+          content = jsonAce.getValue();
+          
+          if (!content.trim()) {
+            showToast('JSON editor is empty', 'warning');
+            return;
+          }
+          
+          // Validate before saving
+          JSON.parse(content);
+          
+          mimeType = 'application/json;charset=utf-8';
+          defaultExt = '.json';
         }
         
-        editorState.syncLock = false;
+        const blob = new Blob([content], { type: mimeType });
         
-        setSyncStatus('json', 'synced');
-        setSyncStatus('yaml', 'synced');
+        const filename = prompt(
+          `Enter filename:`, 
+          `data${defaultExt}`
+        );
         
-      } catch (error) {
-        console.error('Error syncing from tree mode:', error);
-      }
-    }
-    
-    function syncToTreeMode() {
-      try {
-        let jsonText;
+        if (!filename) return; // User cancelled
         
-        // Get JSON from last edited pane
-        if (editorState.lastEditedPane === 'yaml') {
-          const yamlText = editorState.currentMode === 'code' 
-            ? yamlAce.getValue() 
-            : document.getElementById('yamlTextEditor').value;
-          const jsonObj = yamlToJson(yamlText);
-          editor.set(jsonObj);
-        } else {
-          jsonText = editorState.currentMode === 'code' 
-            ? jsonAce.getValue() 
-            : document.getElementById('jsonTextEditor').value;
-          const jsonObj = JSON.parse(jsonText);
-          editor.set(jsonObj);
-        }
+        const finalFilename = filename.includes('.') ? filename : filename + defaultExt;
+        
+        saveAs(blob, finalFilename);
+        showToast(`${editorState.currentFormat.toUpperCase()} saved successfully`, 'success');
         
       } catch (error) {
-        console.error('Error syncing to tree mode:', error);
-        alert('Error loading data: ' + error.message);
+        showToast('Error saving file: ' + error.message, 'error', 0);
       }
     }
     
     // ============================================================================
-    // PHASE 5: Format Toggle and UI
+    // Format Toggle
     // ============================================================================
     
     function switchFormat(newFormat) {
       if (editorState.currentFormat === newFormat) return;
       
-      // Show warning for YAML if not shown before
-      if (newFormat === 'yaml' && !editorState.warningShown) {
-        showWarningModal();
-      }
-      
       editorState.currentFormat = newFormat;
       updateFormatUI();
       
-      showValidationStatus('valid', `Switched to ${newFormat.toUpperCase()} mode`);
+      showToast(`Switched to ${newFormat.toUpperCase()} mode`, 'info');
     }
     
     function updateFormatUI() {
@@ -1261,292 +1808,8 @@
     }
     
     // ============================================================================
-    // PHASE 6: File Operations
+    // Utility Functions
     // ============================================================================
-    
-    // Load file
-    document.getElementById('loadFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const content = event.target.result;
-        
-        // Auto-detect format
-        const detectedFormat = detectFormat(content, file.name);
-        console.log('Detected format:', detectedFormat, 'for file:', file.name);
-        
-        try {
-          let jsonData;
-          
-          if (detectedFormat === 'yaml') {
-            jsonData = yamlToJson(content);
-            editorState.currentFormat = 'yaml';
-            
-            // Show warning on first YAML load
-            if (!editorState.warningShown) {
-              showWarningModal();
-            }
-            
-            showValidationStatus('valid', 'YAML file loaded successfully');
-          } else if (detectedFormat === 'json') {
-            jsonData = JSON.parse(content);
-            editorState.currentFormat = 'json';
-            showValidationStatus('valid', 'JSON file loaded successfully');
-          } else {
-            // Unknown format - try JSON first, then YAML
-            try {
-              jsonData = JSON.parse(content);
-              editorState.currentFormat = 'json';
-            } catch (e) {
-              jsonData = yamlToJson(content);
-              editorState.currentFormat = 'yaml';
-            }
-            showValidationStatus('valid', 'File loaded successfully');
-          }
-          
-          // Load into editor
-          editor.set(jsonData);
-          updateFormatUI();
-          
-          // If in code/text mode, sync to dual editors
-          if (editorState.currentMode !== 'tree') {
-            syncFromTreeMode();
-          }
-          
-        } catch (error) {
-          console.error('Error loading file:', error);
-          alert('Error loading file: ' + error.message);
-        }
-      };
-      
-      reader.readAsText(file);
-      e.target.value = '';
-    });
-    
-    // Save file
-    function saveFile() {
-      try {
-        let jsonObj;
-        
-        // Get data from appropriate source
-        if (editorState.currentMode === 'tree') {
-          jsonObj = editor.get();
-        } else if (editorState.lastEditedPane === 'yaml') {
-          const yamlText = editorState.currentMode === 'code' 
-            ? yamlAce.getValue() 
-            : document.getElementById('yamlTextEditor').value;
-          jsonObj = yamlToJson(yamlText);
-        } else {
-          const jsonText = editorState.currentMode === 'code' 
-            ? jsonAce.getValue() 
-            : document.getElementById('jsonTextEditor').value;
-          jsonObj = JSON.parse(jsonText);
-        }
-        
-        // Convert to target format
-        let content, mimeType, defaultExt;
-        
-        if (editorState.currentFormat === 'yaml') {
-          content = jsonToYaml(jsonObj);
-          mimeType = 'text/yaml;charset=utf-8';
-          defaultExt = '.yaml';
-        } else {
-          content = JSON.stringify(jsonObj, null, 2);
-          mimeType = 'application/json;charset=utf-8';
-          defaultExt = '.json';
-        }
-        
-        const blob = new Blob([content], { type: mimeType });
-        
-        const filename = prompt(
-          `Enter filename:`, 
-          `data${defaultExt}`
-        ) || `data${defaultExt}`;
-        
-        const finalFilename = filename.includes('.') ? filename : filename + defaultExt;
-        
-        saveAs(blob, finalFilename);
-        showValidationStatus('valid', `${editorState.currentFormat.toUpperCase()} saved successfully`);
-        
-      } catch (error) {
-        console.error('Error saving file:', error);
-        alert('Error saving file: ' + error.message);
-      }
-    }
-    
-    // ============================================================================
-    // PHASE 7: Update Existing Functions
-    // ============================================================================
-    
-    function formatContent() {
-      try {
-        if (editorState.currentMode === 'tree') {
-          const json = editor.get();
-          editor.set(json);
-          editor.expandAll();
-        } else if (editorState.currentMode === 'code') {
-          // Format the active editors
-          const jsonText = jsonAce.getValue();
-          const jsonObj = JSON.parse(jsonText);
-          jsonAce.setValue(JSON.stringify(jsonObj, null, 2), -1);
-          // Trigger sync
-          syncJsonToYaml();
-        } else {
-          // Text mode
-          const jsonText = document.getElementById('jsonTextEditor').value;
-          const jsonObj = JSON.parse(jsonText);
-          document.getElementById('jsonTextEditor').value = JSON.stringify(jsonObj, null, 2);
-          syncJsonToYaml();
-        }
-        
-        showValidationStatus('valid', `${editorState.currentFormat.toUpperCase()} formatted`);
-      } catch (error) {
-        alert('Cannot format: ' + error.message);
-      }
-    }
-    
-    function compactContent() {
-      try {
-        if (editorState.currentMode === 'tree') {
-          const json = editor.get();
-          const compact = JSON.stringify(json);
-          editor.setText(compact);
-        } else if (editorState.currentMode === 'code') {
-          if (editorState.currentFormat === 'yaml') {
-            // Compact YAML (flow style)
-            const yamlText = yamlAce.getValue();
-            const jsonObj = yamlToJson(yamlText);
-            const compactYaml = jsyaml.dump(jsonObj, { flowLevel: 0, indent: 0 });
-            yamlAce.setValue(compactYaml, -1);
-          } else {
-            // Compact JSON
-            const jsonText = jsonAce.getValue();
-            const jsonObj = JSON.parse(jsonText);
-            jsonAce.setValue(JSON.stringify(jsonObj), -1);
-          }
-        } else {
-          // Text mode
-          if (editorState.currentFormat === 'yaml') {
-            const yamlText = document.getElementById('yamlTextEditor').value;
-            const jsonObj = yamlToJson(yamlText);
-            const compactYaml = jsyaml.dump(jsonObj, { flowLevel: 0 });
-            document.getElementById('yamlTextEditor').value = compactYaml;
-          } else {
-            const jsonText = document.getElementById('jsonTextEditor').value;
-            const jsonObj = JSON.parse(jsonText);
-            document.getElementById('jsonTextEditor').value = JSON.stringify(jsonObj);
-          }
-        }
-        
-        showValidationStatus('valid', `${editorState.currentFormat.toUpperCase()} compacted`);
-      } catch (error) {
-        alert('Cannot compact: ' + error.message);
-      }
-    }
-    
-    async function validateContent() {
-      try {
-        if (editorState.currentMode === 'tree') {
-          const errors = await editor.validate();
-          if (errors.length === 0) {
-            showValidationStatus('valid', '✓ No validation errors found');
-          } else {
-            showValidationStatus('invalid', `✗ Found ${errors.length} validation error(s)`);
-            const errorMessages = errors.map((err, idx) => 
-              `${idx + 1}. ${err.path ? err.path.join('.') + ': ' : ''}${err.message}`
-            ).join('\n');
-            alert('Validation Errors:\n\n' + errorMessages);
-          }
-        } else {
-          // Validate from dual editors
-          const jsonText = editorState.currentMode === 'code' 
-            ? jsonAce.getValue() 
-            : document.getElementById('jsonTextEditor').value;
-          
-          JSON.parse(jsonText); // Will throw if invalid
-          showValidationStatus('valid', '✓ No validation errors found');
-        }
-      } catch (error) {
-        showValidationStatus('invalid', '✗ Invalid syntax');
-        alert('Validation failed: ' + error.message);
-      }
-    }
-    
-    function repairContent() {
-      try {
-        const mode = editorState.currentMode;
-        
-        if (mode === 'tree') {
-          alert('Repair is only available in Code or Text mode. Please switch modes first.');
-          return;
-        }
-        
-        if (mode === 'code') {
-          if (editorState.lastEditedPane === 'json') {
-            // Try to repair JSON using built-in repair
-            const jsonText = jsonAce.getValue();
-            try {
-              const repaired = JSON.parse(jsonText);
-              jsonAce.setValue(JSON.stringify(repaired, null, 2), -1);
-              syncJsonToYaml();
-            } catch (e) {
-              alert('Cannot repair JSON: ' + e.message);
-            }
-          } else {
-            // Repair YAML by parsing and re-dumping
-            const yamlText = yamlAce.getValue();
-            try {
-              const parsed = yamlToJson(yamlText);
-              const repaired = jsonToYaml(parsed);
-              yamlAce.setValue(repaired, -1);
-              syncYamlToJson();
-            } catch (e) {
-              alert('Cannot repair YAML: ' + e.message);
-            }
-          }
-        } else {
-          // Text mode
-          if (editorState.lastEditedPane === 'json') {
-            const jsonText = document.getElementById('jsonTextEditor').value;
-            try {
-              const repaired = JSON.parse(jsonText);
-              document.getElementById('jsonTextEditor').value = JSON.stringify(repaired, null, 2);
-              syncJsonToYaml();
-            } catch (e) {
-              alert('Cannot repair JSON: ' + e.message);
-            }
-          } else {
-            const yamlText = document.getElementById('yamlTextEditor').value;
-            try {
-              const parsed = yamlToJson(yamlText);
-              const repaired = jsonToYaml(parsed);
-              document.getElementById('yamlTextEditor').value = repaired;
-              syncYamlToJson();
-            } catch (e) {
-              alert('Cannot repair YAML: ' + e.message);
-            }
-          }
-        }
-        
-        showValidationStatus('valid', 'Content repaired');
-      } catch (error) {
-        alert('Cannot repair: ' + error.message);
-      }
-    }
-    
-    function clearEditor() {
-      if (confirm('Are you sure you want to clear all content?')) {
-        editor.set({});
-        
-        if (editorState.currentMode !== 'tree') {
-          syncFromTreeMode();
-        }
-        
-        showValidationStatus('valid', 'Editor cleared');
-      }
-    }
     
     function loadExample() {
       const exampleData = {
@@ -1578,93 +1841,55 @@
             "https://example.com",
             "https://app.example.com",
             "https://api.example.com"
-          ],
-          "rate_limits": {
-            "requests_per_minute": 1000,
-            "burst_size": 100
-          },
-          "timeouts": {
-            "connection": 30,
-            "read": 60,
-            "write": 60
-          }
+          ]
         }
       };
       
-      editor.set(exampleData);
+      const jsonText = JSON.stringify(exampleData, null, 2);
+      const yamlText = jsonToYaml(exampleData);
       
-      if (editorState.currentMode === 'tree') {
-        editor.expandAll();
-      } else {
-        syncFromTreeMode();
+      jsonAce.setValue(jsonText, -1);
+      yamlAce.setValue(yamlText, -1);
+      
+      updateValidationBadge('json');
+      updateValidationBadge('yaml');
+      
+      showToast('Example data loaded', 'success');
+    }
+    
+    function clearEditors() {
+      if (confirm('Are you sure you want to clear all editors?')) {
+        jsonAce.setValue('', -1);
+        yamlAce.setValue('', -1);
+        
+        updateValidationBadge('json');
+        updateValidationBadge('yaml');
+        
+        showToast('Editors cleared', 'success');
       }
-      
-      showValidationStatus('valid', `Example ${editorState.currentFormat.toUpperCase()} loaded`);
     }
-    
-    // ============================================================================
-    // PHASE 8: Warning Modal
-    // ============================================================================
-    
-    function showWarningModal() {
-      const modal = document.getElementById('yamlWarningModal');
-      modal.classList.add('active');
-    }
-    
-    function closeWarningModal() {
-      const modal = document.getElementById('yamlWarningModal');
-      const dontShowAgain = document.getElementById('dontShowAgain').checked;
-      
-      if (dontShowAgain) {
-        localStorage.setItem('yamlWarningShown', 'true');
-        editorState.warningShown = true;
-      }
-      
-      modal.classList.remove('active');
-    }
-    
-    // ============================================================================
-    // Utility Functions
-    // ============================================================================
     
     function toggleInfo() {
       const panel = document.getElementById('infoPanel');
       panel.classList.toggle('visible');
     }
     
-    function updateValidationStatus() {
-      try {
-        editor.get();
-        showValidationStatus('valid', '✓ Valid');
-      } catch (error) {
-        showValidationStatus('invalid', '✗ Invalid');
-      }
-    }
-    
-    function showValidationStatus(type, message) {
-      const status = document.getElementById('validationStatus');
-      status.className = 'validation-status ' + type;
-      status.textContent = message;
-      
-      // Auto-hide after 3 seconds for success messages
-      if (type === 'valid') {
-        setTimeout(() => {
-          status.style.display = 'none';
-        }, 3000);
-      }
-    }
-    
     // ============================================================================
-    // Initialization
+    // Initialize on Load
     // ============================================================================
     
-    // Load initial example
-    loadExample();
+    window.addEventListener('DOMContentLoaded', function() {
+      initializeEditors();
+      loadExample();
+      console.log('JSON/YAML Editor initialized successfully');
+    });
     
-    // Initialize validation status
-    updateValidationStatus();
-    
-    console.log('JSON/YAML Editor initialized successfully');
+    // Close modal when clicking outside
+    document.getElementById('validationModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeValidationModal();
+      }
+    });
   </script>
 </body>
 </html>
