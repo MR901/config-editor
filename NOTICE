@@ -3,6 +3,15 @@ https://github.com/josdejong/jsoneditor
 
 Copyright (C) 2011-2025 Jos de Jong
 
+This work includes modifications and enhancements:
+- Professional UI redesign with corporate styling
+- YAML format support with bidirectional conversion
+- Enhanced file operations and validation
+- Responsive design improvements
+- Custom branding and features
+
+Modifications Copyright (C) 2025 MR901.CO.IN
+https://mr901.co.in
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

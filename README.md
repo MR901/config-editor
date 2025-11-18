@@ -1,155 +1,194 @@
-# JSON Editor - MR901.CO.IN
+# Config Editor
 
-A powerful, feature-rich JSON editor ready for GitHub Pages deployment. Edit, validate, format, and transform JSON with ease.
+A powerful JSON/YAML editor for editing configuration files. Features a clean interface with multiple editing modes, real-time validation, and bidirectional format conversion.
 
-![JSON Editor](https://img.shields.io/badge/JSON-Editor-667eea?style=for-the-badge)
-![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)
+## Features
 
-## 🚀 Features
+### Dual Format Support
+- **JSON & YAML**: Seamlessly edit both formats with automatic conversion
+- **Format Detection**: Automatically detects file format on load
+- **Live Sync**: Real-time synchronization between JSON and YAML views
 
-### Core Editing Features
-- **Multiple Modes**: Switch between Tree, Code, and Text editing modes
-- **Drag & Drop**: Reorder items easily in tree view
-- **Search & Replace**: Find and replace text with Ctrl+F / Ctrl+H
-- **Undo/Redo**: Full undo/redo support (Ctrl+Z / Ctrl+Y)
+### Editing Modes
+- **Tree Mode**: Visual hierarchical view with drag-and-drop
+- **Code Mode**: Side-by-side JSON and YAML editors with syntax highlighting
+- **Text Mode**: Simple plain text editing
 
-### Advanced Features
-- **JSON Schema Validation**: Automatic validation with visual error indicators
-- **Color Picker**: Click on hex color values to open built-in color picker
-- **Repair JSON**: Automatically fix common JSON syntax errors
-- **Format/Compact**: Pretty-print or minify JSON with one click
+### Core Functions
+- **Load/Save**: Import and export JSON or YAML files
+- **Format**: Pretty-print with proper indentation
+- **Compact**: Minify to single line
+- **Validate**: Real-time syntax and schema validation
+- **Repair**: Automatically fix common syntax errors
+- **Search**: Find and replace with Ctrl+F / Ctrl+H
 
-### File Operations
-- **Load JSON**: Import JSON files from your computer
-- **Save JSON**: Export JSON to local files
-- **Example Data**: Quick-start with example JSON
-
-## 🎯 Usage
-
-### Online
-Simply open `index.html` in your web browser or visit the deployed GitHub Pages URL.
+## Quick Start
 
 ### Local Development
-1. Clone this repository
-2. Open `index.html` in your browser
-   - Or run a local server: `python3 -m http.server 8888`
-   - Access at: `http://localhost:8888`
 
-## ⌨️ Keyboard Shortcuts
+1. **Start a local server**:
+   ```bash
+   cd config-editor
+   python3 -m http.server 8080
+   ```
+
+2. **Open in browser**:
+   ```
+   http://localhost:8080
+   ```
+
+### Alternative: Direct Open
+
+Simply open `index.html` directly in your web browser. All features work without a server.
+
+## Usage
+
+### Loading Files
+
+1. Click **↑ Load** button
+2. Select a `.json`, `.yaml`, or `.yml` file
+3. Format is automatically detected
+4. Edit using your preferred mode
+
+### Switching Formats
+
+- Use the **JSON/YAML** toggle buttons in the toolbar
+- Save in either format regardless of source format
+- Current format is shown in the format badge
+
+### Editing Modes
+
+Switch between modes using the editor's mode selector:
+
+- **Tree**: Best for structural changes and visual editing
+- **Code**: Shows both JSON and YAML side-by-side
+- **Text**: Simple text editing with live conversion
+
+### Saving Files
+
+1. Make your edits
+2. Click **↓ Save** button
+3. Choose format (JSON or YAML)
+4. Specify filename and location
+
+## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+Z` | Undo |
-| `Ctrl+Y` or `Ctrl+Shift+Z` | Redo |
+| `Ctrl+Y` | Redo |
 | `Ctrl+F` | Search |
-| `Ctrl+H` | Search & Replace |
-| `Ctrl+D` | Duplicate field/value |
-| `Ctrl+Enter` | Open link or color picker |
-| `Alt+End` | Move to last field |
-| `Ctrl+M` | Show actions menu |
+| `Ctrl+H` | Find & Replace |
+| `Ctrl+D` | Duplicate |
+| `Ctrl+M` | Actions menu |
 
-## 🌐 GitHub Pages Deployment
+## YAML Limitations
 
-### Method 1: Direct Deployment
-1. Push this directory to your GitHub repository
-2. Go to repository Settings → Pages
-3. Set source to main branch → `/jsoneditor` folder
-4. Your editor will be live at `https://yourusername.github.io/repository/jsoneditor/`
+Due to JSON-based internal representation, some YAML features are not preserved:
 
-### Method 2: Root Deployment
-1. Move all files from `jsoneditor/` to repository root
-2. Go to repository Settings → Pages
-3. Set source to main branch → root
-4. Your editor will be live at `https://yourusername.github.io/repository/`
+- Comments are not retained
+- Anchors and aliases are expanded
+- Multi-line string formatting is simplified
+- Only the first document in multi-document files is loaded
 
-## 📁 File Structure
+For best results with YAML, use Tree mode for structural editing.
+
+## GitHub Pages Deployment
+
+### Option 1: Root Deployment
+
+1. Push all files to your repository root
+2. Go to repository **Settings** → **Pages**
+3. Set source to `main` branch and `/` (root)
+4. Your editor will be live at `https://username.github.io/repository/`
+
+### Option 2: Subdirectory Deployment
+
+1. Keep files in `config-editor/` directory
+2. Push to repository
+3. Go to **Settings** → **Pages**
+4. Set source to `main` branch and `/` (root)
+5. Access at `https://username.github.io/repository/config-editor/`
+
+### Option 3: Custom Domain
+
+1. Deploy using Option 1 or 2
+2. Add a `CNAME` file with your domain name
+3. Configure DNS with a CNAME record pointing to `username.github.io`
+4. Enable custom domain in repository settings
+
+## File Structure
 
 ```
-jsoneditor/
-├── index.html              # Main application file
-├── dist/                   # Distribution files
+config-editor/
+├── index.html              # Main application
+├── dist/                   # Production assets
 │   ├── jsoneditor.min.js   # Minified JavaScript
 │   ├── jsoneditor.min.css  # Minified CSS
-│   └── img/                # Icons and images
-├── docs/                   # API documentation
-├── README.md               # This file
-├── LICENSE                 # Apache 2.0 License
-└── NOTICE                  # Copyright notices
+│   └── img/                # Icons
+├── LICENSE                 # Apache 2.0
+├── NOTICE                  # Copyright notices
+└── README.md               # This file
 ```
 
-## 🎨 Customization
+## Browser Compatibility
 
-You can customize the editor by modifying `index.html`:
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
-### Change Colors
-Edit the CSS gradient in the `<style>` section:
+## Development
+
+The editor is a single-page application with no build process required. To modify:
+
+1. Edit `index.html` for UI and functionality changes
+2. Test locally with a web server
+3. Deploy changes by committing and pushing
+
+### Customization
+
+Edit the CSS variables in `index.html` to customize colors:
+
 ```css
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+:root {
+  --primary-blue: #2563eb;
+  --success-green: #10b981;
+  /* ... more variables */
+}
 ```
 
-### Add JSON Schema Validation
-Add schema to editor options:
+## Troubleshooting
+
+### Editor Not Loading
+
+- Ensure all files in `dist/` are present
+- Check browser console for errors
+- Verify paths are relative (not absolute)
+
+### Features Not Working
+
+- Make sure JavaScript is enabled
+- Check that CDN resources are accessible
+- Clear browser cache and reload
+
+### YAML Not Converting
+
+- Verify YAML syntax is valid
+- Check sync status indicators
+- Try switching modes (Tree → Code)
+
+## API Usage
+
+For programmatic usage, the editor can be initialized with options:
+
 ```javascript
-const options = {
-  schema: {
-    type: 'object',
-    properties: {
-      name: { type: 'string' },
-      age: { type: 'number' }
-    }
-  }
-};
+const editor = new JSONEditor(container, {
+  mode: 'tree',
+  modes: ['tree', 'code', 'text'],
+  schema: { /* your JSON schema */ }
+});
 ```
 
-### Change Default Example
-Modify the `loadExample()` function in the script section.
-
-## 🛠️ Technologies
-
-- **JSONEditor**: [josdejong/jsoneditor](https://github.com/josdejong/jsoneditor) - Core editor library
-- **FileSaver.js**: File download functionality
-- **Vanilla JavaScript**: No framework dependencies
-- **Modern CSS**: Responsive design with CSS Grid and Flexbox
-
-## 📝 License
-
-This project uses JSONEditor which is licensed under the Apache 2.0 License.
-
-Original JSONEditor by Jos de Jong: https://github.com/josdejong/jsoneditor
-
-## 🤝 Credits
-
-- **JSONEditor Library**: [Jos de Jong](https://github.com/josdejong)
-- **Custom Implementation**: [MR901.CO.IN](https://mr901.co.in)
-
-## 📧 Support
-
-For issues related to:
-- **This implementation**: Contact via [MR901.CO.IN](https://mr901.co.in)
-- **JSONEditor library**: See [JSONEditor GitHub](https://github.com/josdejong/jsoneditor/issues)
-
-## 🌟 Features Showcase
-
-### Tree Mode
-- Visual hierarchical view
-- Expandable/collapsible nodes
-- Drag-and-drop reordering
-- Context menu for actions
-- Color picker for hex values
-
-### Code Mode
-- Syntax highlighting (powered by Ace)
-- Line numbers
-- Code folding
-- Auto-completion
-- Error detection
-
-### Text Mode
-- Plain text editing
-- Fast for large files
-- Simple copy/paste
-- Minimal interface
-
----
-
-Made with ❤️ by [MR901.CO.IN](https://mr901.co.in)
+Refer to the inline help panel (? button) for more details.
