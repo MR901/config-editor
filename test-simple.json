@@ -1,0 +1,16 @@
+{
+  "name": "Simple Test",
+  "version": "1.0.0",
+  "nested": {
+    "key": "value",
+    "array": [1, 2, 3, 4, 5],
+    "boolean": true,
+    "null": null
+  },
+  "colors": {
+    "primary": "#2563eb",
+    "secondary": "#64748b",
+    "success": "#10b981"
+  }
+}
+

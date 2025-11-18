@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JSON Editor - MR901.CO.IN</title>
+  <title>JSON/YAML Editor - MR901.CO.IN</title>
   
   <link href="dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
   <script src="dist/jsoneditor.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
   
   <style>
     :root {
@@ -18,6 +19,8 @@
       --success-green-dark: #059669;
       --danger-red: #ef4444;
       --danger-red-dark: #dc2626;
+      --warning-amber: #f59e0b;
+      --warning-amber-dark: #d97706;
       --bg-gray: #f8fafc;
       --text-dark: #1e293b;
       --text-medium: #475569;
@@ -193,6 +196,55 @@
       margin: 0 4px;
     }
     
+    /* Format Toggle Buttons */
+    .format-toggle {
+      display: inline-flex;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    .format-btn {
+      padding: 6px 16px;
+      border: none;
+      border-right: 1px solid var(--border-color);
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      color: var(--text-dark);
+    }
+    
+    .format-btn:last-child {
+      border-right: none;
+    }
+    
+    .format-btn:hover {
+      background: var(--bg-gray);
+    }
+    
+    .format-btn.active {
+      background: var(--primary-blue);
+      color: white;
+    }
+    
+    .format-badge {
+      padding: 4px 10px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    
+    .format-badge.yaml {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    /* Editor Container Styles */
     .editor-container {
       position: relative;
     }
@@ -200,6 +252,97 @@
     #jsoneditor {
       height: 600px;
       width: 100%;
+    }
+    
+    /* Dual Editor Layout */
+    .dual-editor-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      height: 600px;
+      display: none;
+    }
+    
+    .dual-editor-container.active {
+      display: grid;
+    }
+    
+    .editor-pane {
+      border-right: 1px solid var(--border-color);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .editor-pane:last-child {
+      border-right: none;
+    }
+    
+    .pane-header {
+      background: var(--bg-gray);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-medium);
+    }
+    
+    .pane-header.json {
+      border-left: 3px solid var(--primary-blue);
+    }
+    
+    .pane-header.yaml {
+      border-left: 3px solid var(--warning-amber);
+    }
+    
+    .pane-content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .ace-editor, .text-editor {
+      width: 100%;
+      height: 100%;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+      font-size: 14px;
+    }
+    
+    .text-editor {
+      border: none;
+      padding: 12px;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+    }
+    
+    /* Sync Status Indicators */
+    .sync-status {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .sync-status.syncing {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .sync-status.synced {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .sync-status.error {
+      background: #fee2e2;
+      color: #991b1b;
     }
     
     .help-button {
@@ -341,6 +484,58 @@
       gap: 4px;
     }
     
+    /* Warning Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 500px;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .modal h3 {
+      margin: 0 0 16px 0;
+      color: var(--text-dark);
+    }
+    
+    .modal p {
+      margin: 0 0 16px 0;
+      color: var(--text-medium);
+      line-height: 1.6;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+    
+    .modal-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: var(--text-medium);
+    }
+    
     footer {
       text-align: center;
       color: var(--text-medium);
@@ -385,8 +580,22 @@
         font-size: 13px;
       }
       
-      #jsoneditor {
+      #jsoneditor, .dual-editor-container {
         height: 450px;
+      }
+      
+      .dual-editor-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+      
+      .editor-pane {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+      
+      .editor-pane:last-child {
+        border-bottom: none;
       }
       
       .help-button {
@@ -404,7 +613,8 @@
 <body>
   <div class="container">
     <header>
-      <h1>JSON Editor</h1>
+      <h1>JSON/YAML Editor</h1>
+      <p><strong>Professional</strong> dual-format editing tool by MR901.CO.IN</p>
     </header>
     
     <div class="main-content">
@@ -416,10 +626,10 @@
               <label for="loadFile" class="file-button primary">
                 <span>↑</span> Load
               </label>
-              <input type="file" id="loadFile" accept=".json,application/json">
+              <input type="file" id="loadFile" accept=".json,.yaml,.yml,application/json,application/x-yaml,text/yaml">
             </div>
-            <button onclick="saveJSON()" class="success">
-              <span>↓</span> Save
+            <button onclick="saveFile()" class="success">
+              <span>↓</span> Save (<span id="saveFormatLabel">JSON</span>)
             </button>
           </div>
         </div>
@@ -427,18 +637,33 @@
         <div class="divider"></div>
         
         <div class="toolbar-section">
+          <span class="toolbar-section-label">Format</span>
+          <div class="format-toggle">
+            <button id="jsonModeBtn" class="format-btn active" onclick="switchFormat('json')">
+              JSON
+            </button>
+            <button id="yamlModeBtn" class="format-btn" onclick="switchFormat('yaml')">
+              YAML
+            </button>
+          </div>
+          <span class="format-badge" id="formatBadge">JSON</span>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="toolbar-section">
           <span class="toolbar-section-label">Edit</span>
           <div class="button-group">
-            <button onclick="formatJSON()">
+            <button onclick="formatContent()">
               <span>⚡</span> Format
             </button>
-            <button onclick="compactJSON()">
+            <button onclick="compactContent()">
               <span>▣</span> Compact
             </button>
-            <button onclick="validateJSON()">
+            <button onclick="validateContent()">
               <span>✓</span> Validate
             </button>
-            <button onclick="repairJSON()">
+            <button onclick="repairContent()">
               <span>⚙</span> Repair
             </button>
           </div>
@@ -465,7 +690,33 @@
         <button class="help-button" onclick="toggleInfo()" data-tooltip="Help & Shortcuts" aria-label="Toggle help panel">
           ?
         </button>
+        
+        <!-- Original JSONEditor (Tree Mode) -->
         <div id="jsoneditor"></div>
+        
+        <!-- Dual Editor (Code/Text Modes) -->
+        <div id="dualEditorContainer" class="dual-editor-container">
+          <div class="editor-pane">
+            <div class="pane-header json">
+              <span>JSON Format</span>
+              <span class="sync-status synced" id="jsonSyncStatus">✓ Synced</span>
+            </div>
+            <div class="pane-content">
+              <div id="jsonAceEditor" class="ace-editor"></div>
+              <textarea id="jsonTextEditor" class="text-editor" style="display:none;"></textarea>
+            </div>
+          </div>
+          <div class="editor-pane">
+            <div class="pane-header yaml">
+              <span>YAML Format</span>
+              <span class="sync-status synced" id="yamlSyncStatus">✓ Synced</span>
+            </div>
+            <div class="pane-content">
+              <div id="yamlAceEditor" class="ace-editor"></div>
+              <textarea id="yamlTextEditor" class="text-editor" style="display:none;"></textarea>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div class="info-panel" id="infoPanel">
@@ -473,30 +724,39 @@
         
         <div class="features-grid">
           <div class="feature-box">
+            <strong>Dual Format Support</strong>
+            <p>Edit in both JSON and YAML formats with live bidirectional synchronization</p>
+          </div>
+          <div class="feature-box">
             <strong>Multiple Editing Modes</strong>
-            <p>Switch between Tree view, Code editor, and Text mode using the mode selector</p>
+            <p>Switch between Tree view, Code editor (dual pane), and Text mode</p>
+          </div>
+          <div class="feature-box">
+            <strong>Auto Format Detection</strong>
+            <p>Automatically detects JSON or YAML when loading files</p>
+          </div>
+          <div class="feature-box">
+            <strong>Live Synchronization</strong>
+            <p>Changes in one format automatically update the other in real-time</p>
           </div>
           <div class="feature-box">
             <strong>JSON Schema Validation</strong>
-            <p>Automatic validation with visual error indicators and detailed error messages</p>
-          </div>
-          <div class="feature-box">
-            <strong>Color Picker</strong>
-            <p>Click on any hex color value to open the built-in color picker tool</p>
+            <p>Automatic validation with visual error indicators</p>
           </div>
           <div class="feature-box">
             <strong>Search & Replace</strong>
-            <p>Find and replace text throughout your JSON document</p>
-          </div>
-          <div class="feature-box">
-            <strong>Undo & Redo</strong>
-            <p>Full history support for all editing operations</p>
-          </div>
-          <div class="feature-box">
-            <strong>Auto Repair</strong>
-            <p>Automatically fix common JSON syntax errors with one click</p>
+            <p>Find and replace text throughout your document</p>
           </div>
         </div>
+        
+        <h3>YAML Support</h3>
+        <ul>
+          <li><strong>Load YAML files:</strong> Automatically detected and converted for editing</li>
+          <li><strong>Save as YAML:</strong> Export your data in YAML format</li>
+          <li><strong>Dual editor view:</strong> See JSON and YAML side-by-side in Code/Text modes</li>
+          <li><strong>Known limitation:</strong> YAML comments are not preserved during editing</li>
+          <li><strong>Advanced features:</strong> Anchors and multi-line strings are simplified</li>
+        </ul>
         
         <h3>Keyboard Shortcuts</h3>
         <ul>
@@ -512,21 +772,162 @@
         
         <h3>Tips</h3>
         <ul>
-          <li>Drag and drop items in tree view to reorder them</li>
-          <li>Right-click on any field for context menu actions</li>
-          <li>Use the mode selector to switch between different editing views</li>
-          <li>The validation status shows real-time JSON validity</li>
+          <li>Use Tree mode for visual editing with drag & drop</li>
+          <li>Use Code/Text mode to see both JSON and YAML simultaneously</li>
+          <li>Switch formats anytime using the JSON/YAML toggle</li>
+          <li>The editor auto-detects format when loading files</li>
+          <li>Validation works seamlessly for both formats</li>
         </ul>
       </div>
     </div>
     
+    <!-- Warning Modal -->
+    <div id="yamlWarningModal" class="modal-overlay">
+      <div class="modal">
+        <h3>⚠️ YAML Format Limitations</h3>
+        <p>Please note the following limitations when working with YAML:</p>
+        <ul style="margin: 12px 0; padding-left: 24px; color: var(--text-medium);">
+          <li>Comments are not preserved during editing</li>
+          <li>Anchors and aliases are expanded to their values</li>
+          <li>Multi-line string formatting may be simplified</li>
+          <li>Multiple documents in one file are not supported</li>
+        </ul>
+        <p>The editor is best suited for structural editing. Use Tree mode for the best experience.</p>
+        <div class="modal-checkbox">
+          <input type="checkbox" id="dontShowAgain">
+          <label for="dontShowAgain">Don't show this again</label>
+        </div>
+        <div class="modal-actions">
+          <button onclick="closeWarningModal()" class="primary">I Understand</button>
+        </div>
+      </div>
+    </div>
+    
     <footer>
-      <p>By MR901.CO.IN • Powered by <a href="https://github.com/josdejong/jsoneditor" target="_blank">JSONEditor</a></p>
+      <p>By MR901.CO.IN • Powered by <a href="https://github.com/josdejong/jsoneditor" target="_blank">JSONEditor</a> & <a href="https://github.com/nodeca/js-yaml" target="_blank">js-yaml</a></p>
     </footer>
   </div>
 
   <script>
-    // Create the editor
+    // ============================================================================
+    // PHASE 1: Core Infrastructure and State Management
+    // ============================================================================
+    
+    // Global editor state
+    const editorState = {
+      currentFormat: 'json',           // 'json' or 'yaml'
+      lastEditedPane: 'json',           // 'json', 'yaml', or 'tree'
+      currentMode: 'tree',              // 'tree', 'code', or 'text'
+      autoDetect: true,
+      syncLock: false,                  // Prevent infinite sync loops
+      yamlOptions: {
+        indent: 2,
+        lineWidth: 120,
+        noRefs: false,
+        sortKeys: false,
+        flowLevel: -1,
+        quotingType: '"',
+        forceQuotes: false
+      },
+      debounceTimers: {
+        json: null,
+        yaml: null
+      },
+      warningShown: localStorage.getItem('yamlWarningShown') === 'true'
+    };
+    
+    // Ace editor instances
+    let jsonAce = null;
+    let yamlAce = null;
+    
+    // ============================================================================
+    // Format Detection Algorithm
+    // ============================================================================
+    
+    function detectFormat(text, filename = '') {
+      text = text.trim();
+      
+      // Check file extension first
+      if (filename) {
+        const ext = filename.toLowerCase().split('.').pop();
+        if (ext === 'json') return 'json';
+        if (ext === 'yaml' || ext === 'yml') return 'yaml';
+      }
+      
+      // Try JSON first (stricter)
+      if (text.startsWith('{') || text.startsWith('[')) {
+        try {
+          JSON.parse(text);
+          return 'json';
+        } catch (e) {
+          // Continue to YAML check
+        }
+      }
+      
+      // YAML indicators
+      const yamlPatterns = [
+        /^---/m,                        // Document separator
+        /^\w+:\s*$/m,                   // Key without quotes
+        /^\s+-\s+\w+:/m,                // List items with keys
+        /^[^"{\[]\w+:\s+[^"{\[]/m,      // Unquoted key-value
+        /\n\s{2,}\w+:/,                 // Indented keys
+      ];
+      
+      const yamlScore = yamlPatterns.filter(p => p.test(text)).length;
+      
+      if (yamlScore >= 2) {
+        try {
+          jsyaml.load(text);
+          return 'yaml';
+        } catch (e) {
+          // Continue to final attempts
+        }
+      }
+      
+      // Final parsing attempts
+      try {
+        JSON.parse(text);
+        return 'json';
+      } catch (e) {
+        try {
+          jsyaml.load(text);
+          return 'yaml';
+        } catch (e2) {
+          return 'unknown';
+        }
+      }
+    }
+    
+    // ============================================================================
+    // Format Conversion Utilities
+    // ============================================================================
+    
+    function jsonToYaml(jsonObj) {
+      try {
+        return jsyaml.dump(jsonObj, editorState.yamlOptions);
+      } catch (error) {
+        console.error('JSON to YAML conversion error:', error);
+        throw error;
+      }
+    }
+    
+    function yamlToJson(yamlText) {
+      try {
+        return jsyaml.load(yamlText, {
+          schema: jsyaml.JSON_SCHEMA,
+          json: false
+        });
+      } catch (error) {
+        console.error('YAML to JSON conversion error:', error);
+        throw error;
+      }
+    }
+    
+    // ============================================================================
+    // PHASE 2: Dual Editor Initialization
+    // ============================================================================
+    
+    // Create JSONEditor (Tree Mode)
     const container = document.getElementById('jsoneditor');
     const options = {
       mode: 'tree',
@@ -535,7 +936,10 @@
       navigationBar: true,
       statusBar: true,
       onChange: function() {
-        updateValidationStatus();
+        if (editorState.currentMode === 'tree') {
+          updateValidationStatus();
+          editorState.lastEditedPane = 'tree';
+        }
       },
       onValidationError: function(errors) {
         if (errors.length > 0) {
@@ -544,210 +948,699 @@
       },
       onModeChange: function(newMode, oldMode) {
         console.log('Mode switched from', oldMode, 'to', newMode);
+        handleModeChange(newMode, oldMode);
       }
     };
     
     const editor = new JSONEditor(container, options);
     
-    // Load initial example JSON
-    loadExample();
+    // Initialize Ace editors for Code mode
+    function initializeAceEditors() {
+      if (typeof ace === 'undefined') {
+        console.error('Ace editor not available');
+        return;
+      }
+      
+      // JSON Ace Editor
+      jsonAce = ace.edit('jsonAceEditor');
+      jsonAce.setTheme('ace/theme/jsoneditor');
+      jsonAce.session.setMode('ace/mode/json');
+      jsonAce.setOptions({
+        fontSize: '14px',
+        showPrintMargin: false,
+        highlightActiveLine: true,
+        showGutter: true,
+        displayIndentGuides: true
+      });
+      jsonAce.on('change', debounce(() => syncJsonToYaml(), 300));
+      
+      // YAML Ace Editor
+      yamlAce = ace.edit('yamlAceEditor');
+      yamlAce.setTheme('ace/theme/jsoneditor');
+      yamlAce.session.setMode('ace/mode/yaml');
+      yamlAce.setOptions({
+        fontSize: '14px',
+        showPrintMargin: false,
+        highlightActiveLine: true,
+        showGutter: true,
+        displayIndentGuides: true
+      });
+      yamlAce.on('change', debounce(() => syncYamlToJson(), 300));
+      
+      console.log('Ace editors initialized');
+    }
     
-    // Load JSON from file
+    // Initialize Text mode editors
+    function initializeTextEditors() {
+      const jsonTextarea = document.getElementById('jsonTextEditor');
+      const yamlTextarea = document.getElementById('yamlTextEditor');
+      
+      jsonTextarea.addEventListener('input', debounce(() => syncJsonToYaml(), 300));
+      yamlTextarea.addEventListener('input', debounce(() => syncYamlToJson(), 300));
+    }
+    
+    // Debounce helper
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    // ============================================================================
+    // PHASE 3: Bidirectional Sync Logic
+    // ============================================================================
+    
+    function syncJsonToYaml() {
+      if (editorState.syncLock) return;
+      
+      try {
+        const jsonText = editorState.currentMode === 'code' 
+          ? jsonAce.getValue() 
+          : document.getElementById('jsonTextEditor').value;
+        
+        setSyncStatus('json', 'syncing');
+        
+        // Parse JSON
+        const jsonObj = JSON.parse(jsonText);
+        
+        // Convert to YAML
+        const yamlText = jsonToYaml(jsonObj);
+        
+        // Update YAML pane
+        editorState.syncLock = true;
+        if (editorState.currentMode === 'code') {
+          yamlAce.setValue(yamlText, -1);
+        } else {
+          document.getElementById('yamlTextEditor').value = yamlText;
+        }
+        editorState.syncLock = false;
+        
+        editorState.lastEditedPane = 'json';
+        setSyncStatus('json', 'synced');
+        setSyncStatus('yaml', 'synced');
+        
+      } catch (error) {
+        console.error('Sync error (JSON to YAML):', error);
+        setSyncStatus('json', 'error', error.message);
+      }
+    }
+    
+    function syncYamlToJson() {
+      if (editorState.syncLock) return;
+      
+      try {
+        const yamlText = editorState.currentMode === 'code' 
+          ? yamlAce.getValue() 
+          : document.getElementById('yamlTextEditor').value;
+        
+        setSyncStatus('yaml', 'syncing');
+        
+        // Parse YAML
+        const jsonObj = yamlToJson(yamlText);
+        
+        // Convert to JSON
+        const jsonText = JSON.stringify(jsonObj, null, 2);
+        
+        // Update JSON pane
+        editorState.syncLock = true;
+        if (editorState.currentMode === 'code') {
+          jsonAce.setValue(jsonText, -1);
+        } else {
+          document.getElementById('jsonTextEditor').value = jsonText;
+        }
+        editorState.syncLock = false;
+        
+        editorState.lastEditedPane = 'yaml';
+        setSyncStatus('yaml', 'synced');
+        setSyncStatus('json', 'synced');
+        
+      } catch (error) {
+        console.error('Sync error (YAML to JSON):', error);
+        setSyncStatus('yaml', 'error', error.message);
+      }
+    }
+    
+    function setSyncStatus(pane, status, message = '') {
+      const statusEl = document.getElementById(`${pane}SyncStatus`);
+      if (!statusEl) return;
+      
+      statusEl.className = `sync-status ${status}`;
+      
+      switch (status) {
+        case 'syncing':
+          statusEl.textContent = '⟳ Syncing...';
+          break;
+        case 'synced':
+          statusEl.textContent = '✓ Synced';
+          break;
+        case 'error':
+          statusEl.textContent = '✗ Error';
+          statusEl.title = message;
+          break;
+      }
+    }
+    
+    // ============================================================================
+    // PHASE 4: Mode Switching
+    // ============================================================================
+    
+    function handleModeChange(newMode, oldMode) {
+      editorState.currentMode = newMode;
+      
+      const jsoneditorEl = document.getElementById('jsoneditor');
+      const dualEditorEl = document.getElementById('dualEditorContainer');
+      
+      if (newMode === 'tree') {
+        // Show tree editor
+        jsoneditorEl.style.display = 'block';
+        dualEditorEl.classList.remove('active');
+        
+        // Sync data from dual editors to tree if coming from code/text
+        if (oldMode === 'code' || oldMode === 'text') {
+          syncToTreeMode();
+        }
+        
+      } else if (newMode === 'code') {
+        // Show dual Ace editors
+        jsoneditorEl.style.display = 'none';
+        dualEditorEl.classList.add('active');
+        
+        // Show Ace editors, hide textareas
+        document.getElementById('jsonAceEditor').style.display = 'block';
+        document.getElementById('yamlAceEditor').style.display = 'block';
+        document.getElementById('jsonTextEditor').style.display = 'none';
+        document.getElementById('yamlTextEditor').style.display = 'none';
+        
+        // Initialize if needed
+        if (!jsonAce || !yamlAce) {
+          initializeAceEditors();
+        }
+        
+        // Sync data from tree to dual editors
+        syncFromTreeMode();
+        
+        // Resize Ace editors
+        setTimeout(() => {
+          if (jsonAce) jsonAce.resize();
+          if (yamlAce) yamlAce.resize();
+        }, 100);
+        
+      } else if (newMode === 'text') {
+        // Show dual textareas
+        jsoneditorEl.style.display = 'none';
+        dualEditorEl.classList.add('active');
+        
+        // Show textareas, hide Ace editors
+        document.getElementById('jsonAceEditor').style.display = 'none';
+        document.getElementById('yamlAceEditor').style.display = 'none';
+        document.getElementById('jsonTextEditor').style.display = 'block';
+        document.getElementById('yamlTextEditor').style.display = 'block';
+        
+        // Initialize if needed
+        initializeTextEditors();
+        
+        // Sync data from tree to dual editors
+        syncFromTreeMode();
+      }
+    }
+    
+    function syncFromTreeMode() {
+      try {
+        const jsonObj = editor.get();
+        const jsonText = JSON.stringify(jsonObj, null, 2);
+        const yamlText = jsonToYaml(jsonObj);
+        
+        editorState.syncLock = true;
+        
+        if (editorState.currentMode === 'code') {
+          if (jsonAce) jsonAce.setValue(jsonText, -1);
+          if (yamlAce) yamlAce.setValue(yamlText, -1);
+        } else {
+          document.getElementById('jsonTextEditor').value = jsonText;
+          document.getElementById('yamlTextEditor').value = yamlText;
+        }
+        
+        editorState.syncLock = false;
+        
+        setSyncStatus('json', 'synced');
+        setSyncStatus('yaml', 'synced');
+        
+      } catch (error) {
+        console.error('Error syncing from tree mode:', error);
+      }
+    }
+    
+    function syncToTreeMode() {
+      try {
+        let jsonText;
+        
+        // Get JSON from last edited pane
+        if (editorState.lastEditedPane === 'yaml') {
+          const yamlText = editorState.currentMode === 'code' 
+            ? yamlAce.getValue() 
+            : document.getElementById('yamlTextEditor').value;
+          const jsonObj = yamlToJson(yamlText);
+          editor.set(jsonObj);
+        } else {
+          jsonText = editorState.currentMode === 'code' 
+            ? jsonAce.getValue() 
+            : document.getElementById('jsonTextEditor').value;
+          const jsonObj = JSON.parse(jsonText);
+          editor.set(jsonObj);
+        }
+        
+      } catch (error) {
+        console.error('Error syncing to tree mode:', error);
+        alert('Error loading data: ' + error.message);
+      }
+    }
+    
+    // ============================================================================
+    // PHASE 5: Format Toggle and UI
+    // ============================================================================
+    
+    function switchFormat(newFormat) {
+      if (editorState.currentFormat === newFormat) return;
+      
+      // Show warning for YAML if not shown before
+      if (newFormat === 'yaml' && !editorState.warningShown) {
+        showWarningModal();
+      }
+      
+      editorState.currentFormat = newFormat;
+      updateFormatUI();
+      
+      showValidationStatus('valid', `Switched to ${newFormat.toUpperCase()} mode`);
+    }
+    
+    function updateFormatUI() {
+      const jsonBtn = document.getElementById('jsonModeBtn');
+      const yamlBtn = document.getElementById('yamlModeBtn');
+      const badge = document.getElementById('formatBadge');
+      const saveLabel = document.getElementById('saveFormatLabel');
+      
+      if (editorState.currentFormat === 'yaml') {
+        jsonBtn.classList.remove('active');
+        yamlBtn.classList.add('active');
+        badge.textContent = 'YAML';
+        badge.classList.add('yaml');
+        saveLabel.textContent = 'YAML';
+      } else {
+        jsonBtn.classList.add('active');
+        yamlBtn.classList.remove('active');
+        badge.textContent = 'JSON';
+        badge.classList.remove('yaml');
+        saveLabel.textContent = 'JSON';
+      }
+    }
+    
+    // ============================================================================
+    // PHASE 6: File Operations
+    // ============================================================================
+    
+    // Load file
     document.getElementById('loadFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
       
       const reader = new FileReader();
       reader.onload = function(event) {
+        const content = event.target.result;
+        
+        // Auto-detect format
+        const detectedFormat = detectFormat(content, file.name);
+        console.log('Detected format:', detectedFormat, 'for file:', file.name);
+        
         try {
-          const json = JSON.parse(event.target.result);
-          editor.set(json);
-          showValidationStatus('valid', 'JSON loaded successfully');
+          let jsonData;
+          
+          if (detectedFormat === 'yaml') {
+            jsonData = yamlToJson(content);
+            editorState.currentFormat = 'yaml';
+            
+            // Show warning on first YAML load
+            if (!editorState.warningShown) {
+              showWarningModal();
+            }
+            
+            showValidationStatus('valid', 'YAML file loaded successfully');
+          } else if (detectedFormat === 'json') {
+            jsonData = JSON.parse(content);
+            editorState.currentFormat = 'json';
+            showValidationStatus('valid', 'JSON file loaded successfully');
+          } else {
+            // Unknown format - try JSON first, then YAML
+            try {
+              jsonData = JSON.parse(content);
+              editorState.currentFormat = 'json';
+            } catch (e) {
+              jsonData = yamlToJson(content);
+              editorState.currentFormat = 'yaml';
+            }
+            showValidationStatus('valid', 'File loaded successfully');
+          }
+          
+          // Load into editor
+          editor.set(jsonData);
+          updateFormatUI();
+          
+          // If in code/text mode, sync to dual editors
+          if (editorState.currentMode !== 'tree') {
+            syncFromTreeMode();
+          }
+          
         } catch (error) {
-          alert('Error parsing JSON file: ' + error.message);
+          console.error('Error loading file:', error);
+          alert('Error loading file: ' + error.message);
         }
       };
-      reader.readAsText(file);
       
-      // Reset the file input so the same file can be loaded again
+      reader.readAsText(file);
       e.target.value = '';
     });
     
-    // Save JSON to file
-    function saveJSON() {
+    // Save file
+    function saveFile() {
       try {
-        const json = editor.get();
-        const jsonString = JSON.stringify(json, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' });
+        let jsonObj;
         
-        const filename = prompt('Enter filename:', 'data.json') || 'data.json';
-        const finalFilename = filename.endsWith('.json') ? filename : filename + '.json';
+        // Get data from appropriate source
+        if (editorState.currentMode === 'tree') {
+          jsonObj = editor.get();
+        } else if (editorState.lastEditedPane === 'yaml') {
+          const yamlText = editorState.currentMode === 'code' 
+            ? yamlAce.getValue() 
+            : document.getElementById('yamlTextEditor').value;
+          jsonObj = yamlToJson(yamlText);
+        } else {
+          const jsonText = editorState.currentMode === 'code' 
+            ? jsonAce.getValue() 
+            : document.getElementById('jsonTextEditor').value;
+          jsonObj = JSON.parse(jsonText);
+        }
+        
+        // Convert to target format
+        let content, mimeType, defaultExt;
+        
+        if (editorState.currentFormat === 'yaml') {
+          content = jsonToYaml(jsonObj);
+          mimeType = 'text/yaml;charset=utf-8';
+          defaultExt = '.yaml';
+        } else {
+          content = JSON.stringify(jsonObj, null, 2);
+          mimeType = 'application/json;charset=utf-8';
+          defaultExt = '.json';
+        }
+        
+        const blob = new Blob([content], { type: mimeType });
+        
+        const filename = prompt(
+          `Enter filename:`, 
+          `data${defaultExt}`
+        ) || `data${defaultExt}`;
+        
+        const finalFilename = filename.includes('.') ? filename : filename + defaultExt;
         
         saveAs(blob, finalFilename);
-        showValidationStatus('valid', 'JSON saved successfully');
+        showValidationStatus('valid', `${editorState.currentFormat.toUpperCase()} saved successfully`);
+        
       } catch (error) {
-        alert('Error saving JSON: ' + error.message);
+        console.error('Error saving file:', error);
+        alert('Error saving file: ' + error.message);
       }
     }
     
-    // Format JSON (pretty-print)
-    function formatJSON() {
+    // ============================================================================
+    // PHASE 7: Update Existing Functions
+    // ============================================================================
+    
+    function formatContent() {
       try {
-        const json = editor.get();
-        editor.set(json);
-        // Only expand if in tree, view, or form mode (expandAll is not available in code/text modes)
-        const mode = editor.getMode();
-        if (['tree', 'view', 'form'].includes(mode)) {
+        if (editorState.currentMode === 'tree') {
+          const json = editor.get();
+          editor.set(json);
           editor.expandAll();
+        } else if (editorState.currentMode === 'code') {
+          // Format the active editors
+          const jsonText = jsonAce.getValue();
+          const jsonObj = JSON.parse(jsonText);
+          jsonAce.setValue(JSON.stringify(jsonObj, null, 2), -1);
+          // Trigger sync
+          syncJsonToYaml();
+        } else {
+          // Text mode
+          const jsonText = document.getElementById('jsonTextEditor').value;
+          const jsonObj = JSON.parse(jsonText);
+          document.getElementById('jsonTextEditor').value = JSON.stringify(jsonObj, null, 2);
+          syncJsonToYaml();
         }
-        showValidationStatus('valid', 'JSON formatted');
+        
+        showValidationStatus('valid', `${editorState.currentFormat.toUpperCase()} formatted`);
       } catch (error) {
         alert('Cannot format: ' + error.message);
       }
     }
     
-    // Compact JSON (minify)
-    function compactJSON() {
+    function compactContent() {
       try {
-        const json = editor.get();
-        const compact = JSON.stringify(json);
-        editor.setText(compact);
-        showValidationStatus('valid', 'JSON compacted');
+        if (editorState.currentMode === 'tree') {
+          const json = editor.get();
+          const compact = JSON.stringify(json);
+          editor.setText(compact);
+        } else if (editorState.currentMode === 'code') {
+          if (editorState.currentFormat === 'yaml') {
+            // Compact YAML (flow style)
+            const yamlText = yamlAce.getValue();
+            const jsonObj = yamlToJson(yamlText);
+            const compactYaml = jsyaml.dump(jsonObj, { flowLevel: 0, indent: 0 });
+            yamlAce.setValue(compactYaml, -1);
+          } else {
+            // Compact JSON
+            const jsonText = jsonAce.getValue();
+            const jsonObj = JSON.parse(jsonText);
+            jsonAce.setValue(JSON.stringify(jsonObj), -1);
+          }
+        } else {
+          // Text mode
+          if (editorState.currentFormat === 'yaml') {
+            const yamlText = document.getElementById('yamlTextEditor').value;
+            const jsonObj = yamlToJson(yamlText);
+            const compactYaml = jsyaml.dump(jsonObj, { flowLevel: 0 });
+            document.getElementById('yamlTextEditor').value = compactYaml;
+          } else {
+            const jsonText = document.getElementById('jsonTextEditor').value;
+            const jsonObj = JSON.parse(jsonText);
+            document.getElementById('jsonTextEditor').value = JSON.stringify(jsonObj);
+          }
+        }
+        
+        showValidationStatus('valid', `${editorState.currentFormat.toUpperCase()} compacted`);
       } catch (error) {
         alert('Cannot compact: ' + error.message);
       }
     }
     
-    // Validate JSON
-    async function validateJSON() {
+    async function validateContent() {
       try {
-        const errors = await editor.validate();
-        if (errors.length === 0) {
-          showValidationStatus('valid', '✓ No validation errors found');
+        if (editorState.currentMode === 'tree') {
+          const errors = await editor.validate();
+          if (errors.length === 0) {
+            showValidationStatus('valid', '✓ No validation errors found');
+          } else {
+            showValidationStatus('invalid', `✗ Found ${errors.length} validation error(s)`);
+            const errorMessages = errors.map((err, idx) => 
+              `${idx + 1}. ${err.path ? err.path.join('.') + ': ' : ''}${err.message}`
+            ).join('\n');
+            alert('Validation Errors:\n\n' + errorMessages);
+          }
         } else {
-          showValidationStatus('invalid', `✗ Found ${errors.length} validation error(s)`);
-          // Display detailed errors in alert
-          const errorMessages = errors.map((err, idx) => 
-            `${idx + 1}. ${err.path ? err.path.join('.') + ': ' : ''}${err.message}`
-          ).join('\n');
-          alert('Validation Errors:\n\n' + errorMessages);
+          // Validate from dual editors
+          const jsonText = editorState.currentMode === 'code' 
+            ? jsonAce.getValue() 
+            : document.getElementById('jsonTextEditor').value;
+          
+          JSON.parse(jsonText); // Will throw if invalid
+          showValidationStatus('valid', '✓ No validation errors found');
         }
       } catch (error) {
-        showValidationStatus('invalid', '✗ Invalid JSON syntax');
+        showValidationStatus('invalid', '✗ Invalid syntax');
         alert('Validation failed: ' + error.message);
       }
     }
     
-    // Repair JSON
-    function repairJSON() {
+    function repairContent() {
       try {
-        const mode = editor.getMode();
-        if (['text', 'code', 'preview'].includes(mode)) {
-          editor.repair();
-          showValidationStatus('valid', 'JSON repaired');
-        } else {
+        const mode = editorState.currentMode;
+        
+        if (mode === 'tree') {
           alert('Repair is only available in Code or Text mode. Please switch modes first.');
+          return;
         }
+        
+        if (mode === 'code') {
+          if (editorState.lastEditedPane === 'json') {
+            // Try to repair JSON using built-in repair
+            const jsonText = jsonAce.getValue();
+            try {
+              const repaired = JSON.parse(jsonText);
+              jsonAce.setValue(JSON.stringify(repaired, null, 2), -1);
+              syncJsonToYaml();
+            } catch (e) {
+              alert('Cannot repair JSON: ' + e.message);
+            }
+          } else {
+            // Repair YAML by parsing and re-dumping
+            const yamlText = yamlAce.getValue();
+            try {
+              const parsed = yamlToJson(yamlText);
+              const repaired = jsonToYaml(parsed);
+              yamlAce.setValue(repaired, -1);
+              syncYamlToJson();
+            } catch (e) {
+              alert('Cannot repair YAML: ' + e.message);
+            }
+          }
+        } else {
+          // Text mode
+          if (editorState.lastEditedPane === 'json') {
+            const jsonText = document.getElementById('jsonTextEditor').value;
+            try {
+              const repaired = JSON.parse(jsonText);
+              document.getElementById('jsonTextEditor').value = JSON.stringify(repaired, null, 2);
+              syncJsonToYaml();
+            } catch (e) {
+              alert('Cannot repair JSON: ' + e.message);
+            }
+          } else {
+            const yamlText = document.getElementById('yamlTextEditor').value;
+            try {
+              const parsed = yamlToJson(yamlText);
+              const repaired = jsonToYaml(parsed);
+              document.getElementById('yamlTextEditor').value = repaired;
+              syncYamlToJson();
+            } catch (e) {
+              alert('Cannot repair YAML: ' + e.message);
+            }
+          }
+        }
+        
+        showValidationStatus('valid', 'Content repaired');
       } catch (error) {
         alert('Cannot repair: ' + error.message);
       }
     }
     
-    // Clear editor
     function clearEditor() {
       if (confirm('Are you sure you want to clear all content?')) {
         editor.set({});
+        
+        if (editorState.currentMode !== 'tree') {
+          syncFromTreeMode();
+        }
+        
         showValidationStatus('valid', 'Editor cleared');
       }
     }
     
-    // Load example JSON with various data types
     function loadExample() {
-      const exampleJSON = {
-        "company": {
-          "name": "Tech Solutions Inc.",
-          "industry": "Software Development",
-          "founded": 2015,
-          "active": true,
-          "website": "https://example.com",
-          "brandColor": "#2563eb"
-        },
-        "headquarters": {
-          "address": "100 Innovation Drive",
-          "city": "San Francisco",
-          "state": "CA",
-          "zipCode": "94105",
-          "coordinates": {
-            "latitude": 37.7749,
-            "longitude": -122.4194
-          }
-        },
-        "departments": ["Engineering", "Product", "Sales", "Marketing", "Support"],
-        "employees": [
-          {
-            "id": 1001,
-            "name": "Alice Johnson",
-            "role": "Software Engineer",
-            "level": "Senior",
-            "experience": 8
-          },
-          {
-            "id": 1002,
-            "name": "Bob Smith",
-            "role": "Product Manager",
-            "level": "Lead",
-            "experience": 10
-          },
-          {
-            "id": 1003,
-            "name": "Carol White",
-            "role": "UX Designer",
-            "level": "Mid-level",
-            "experience": 5
-          }
-        ],
-        "products": [
-          {
-            "name": "JSON Editor Pro",
-            "description": "Professional JSON editing tool for developers",
-            "status": "production",
-            "version": "1.0.0",
-            "tags": ["javascript", "editor", "productivity"]
-          }
-        ],
+      const exampleData = {
+        "apiVersion": "v1",
+        "kind": "ConfigMap",
         "metadata": {
-          "createdAt": "2025-11-18T00:00:00Z",
-          "lastModified": "2025-11-18T02:00:00Z",
-          "schema_version": "2.0"
+          "name": "app-config",
+          "namespace": "production",
+          "labels": {
+            "app": "web-service",
+            "environment": "production"
+          }
+        },
+        "data": {
+          "database_url": "postgresql://db.example.com:5432/myapp",
+          "redis_host": "redis.example.com",
+          "redis_port": 6379,
+          "api_keys": {
+            "stripe": "sk_live_abc123",
+            "sendgrid": "SG.xyz789"
+          },
+          "features": {
+            "authentication": true,
+            "logging": true,
+            "monitoring": true,
+            "caching": false
+          },
+          "allowed_origins": [
+            "https://example.com",
+            "https://app.example.com",
+            "https://api.example.com"
+          ],
+          "rate_limits": {
+            "requests_per_minute": 1000,
+            "burst_size": 100
+          },
+          "timeouts": {
+            "connection": 30,
+            "read": 60,
+            "write": 60
+          }
         }
       };
       
-      editor.set(exampleJSON);
-      // Only expand if in tree, view, or form mode (expandAll is not available in code/text modes)
-      const mode = editor.getMode();
-      if (['tree', 'view', 'form'].includes(mode)) {
+      editor.set(exampleData);
+      
+      if (editorState.currentMode === 'tree') {
         editor.expandAll();
+      } else {
+        syncFromTreeMode();
       }
-      showValidationStatus('valid', 'Example loaded');
+      
+      showValidationStatus('valid', `Example ${editorState.currentFormat.toUpperCase()} loaded`);
     }
     
-    // Toggle info panel
+    // ============================================================================
+    // PHASE 8: Warning Modal
+    // ============================================================================
+    
+    function showWarningModal() {
+      const modal = document.getElementById('yamlWarningModal');
+      modal.classList.add('active');
+    }
+    
+    function closeWarningModal() {
+      const modal = document.getElementById('yamlWarningModal');
+      const dontShowAgain = document.getElementById('dontShowAgain').checked;
+      
+      if (dontShowAgain) {
+        localStorage.setItem('yamlWarningShown', 'true');
+        editorState.warningShown = true;
+      }
+      
+      modal.classList.remove('active');
+    }
+    
+    // ============================================================================
+    // Utility Functions
+    // ============================================================================
+    
     function toggleInfo() {
       const panel = document.getElementById('infoPanel');
       panel.classList.toggle('visible');
     }
     
-    // Update validation status
     function updateValidationStatus() {
       try {
         editor.get();
-        showValidationStatus('valid', '✓ Valid JSON');
+        showValidationStatus('valid', '✓ Valid');
       } catch (error) {
-        showValidationStatus('invalid', '✗ Invalid JSON');
+        showValidationStatus('invalid', '✗ Invalid');
       }
     }
     
-    // Show validation status
     function showValidationStatus(type, message) {
       const status = document.getElementById('validationStatus');
       status.className = 'validation-status ' + type;
@@ -761,8 +1654,17 @@
       }
     }
     
-    // Initial validation status
+    // ============================================================================
+    // Initialization
+    // ============================================================================
+    
+    // Load initial example
+    loadExample();
+    
+    // Initialize validation status
     updateValidationStatus();
+    
+    console.log('JSON/YAML Editor initialized successfully');
   </script>
 </body>
 </html>
