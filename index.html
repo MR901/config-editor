@@ -597,7 +597,11 @@
       try {
         const json = editor.get();
         editor.set(json);
-        editor.expandAll();
+        // Only expand if in tree, view, or form mode (expandAll is not available in code/text modes)
+        const mode = editor.getMode();
+        if (['tree', 'view', 'form'].includes(mode)) {
+          editor.expandAll();
+        }
         showValidationStatus('valid', 'JSON formatted');
       } catch (error) {
         alert('Cannot format: ' + error.message);
@@ -696,7 +700,11 @@
       };
       
       editor.set(exampleJSON);
-      editor.expandAll();
+      // Only expand if in tree, view, or form mode (expandAll is not available in code/text modes)
+      const mode = editor.getMode();
+      if (['tree', 'view', 'form'].includes(mode)) {
+        editor.expandAll();
+      }
       showValidationStatus('valid', 'Example loaded');
     }
     
